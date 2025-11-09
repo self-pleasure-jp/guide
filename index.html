@@ -300,6 +300,18 @@
         
         <h1 id="main-title">人気無料エロ動画</h1>
         
+        <!-- FANZA TV リンク -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <a href="https://al.dmm.co.jp/?lurl=https%3A%2F%2Fpremium.dmm.co.jp%2F&af_id=yoru365-990&ch=link_tool&ch_id=link" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               style="display: inline-block; background: linear-gradient(135deg, #ff3366 0%, #ff6b9d 100%); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4); transition: all 0.3s;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(255, 51, 102, 0.5)';"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 51, 102, 0.4)';">
+                <span id="fanza-tv-btn">📺 FANZA TV で見放題を楽しむ</span>
+            </a>
+        </div>
+        
         <!-- 無料動画キーワードリンクセクション -->
         <div class="keyword-section">
             <div class="keyword-title" id="keyword-section-title">
@@ -377,6 +389,7 @@
             ja: {
                 warning: '⚠️ 18歳未満の方は閲覧できません',
                 titleTemplate: '{year}年{month}月{day}日の人気無料エロ動画',
+                fanzaTvBtn: '📺 FANZA TV で見放題を楽しむ',
                 keywordSectionTitle: '無料動画を探す',
                 freeIcon: 'FREE',
                 newReleasesTitle: '新着動画 TOP 6',
@@ -389,6 +402,7 @@
             en: {
                 warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
                 titleTemplate: 'Popular Free Adult Videos - {month}/{day}/{year}',
+                fanzaTvBtn: '📺 Watch Unlimited on FANZA TV',
                 keywordSectionTitle: 'Find Free Videos',
                 freeIcon: 'FREE',
                 newReleasesTitle: 'New Releases TOP 6',
@@ -401,6 +415,7 @@
             es: {
                 warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
                 titleTemplate: 'Videos Adultos Gratis Populares - {day}/{month}/{year}',
+                fanzaTvBtn: '📺 Ver Ilimitado en FANZA TV',
                 keywordSectionTitle: 'Buscar Videos Gratis',
                 freeIcon: 'GRATIS',
                 newReleasesTitle: 'Nuevos Lanzamientos TOP 6',
@@ -435,6 +450,7 @@
             
             document.getElementById('warning').textContent = t.warning;
             updateDate();
+            document.getElementById('fanza-tv-btn').textContent = t.fanzaTvBtn;
             document.getElementById('keyword-section-title').innerHTML = 
                 `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
             document.getElementById('new-releases-title').textContent = t.newReleasesTitle;
@@ -461,25 +477,49 @@
             }).join('');
         }
 
+        // 複数のプロキシを試す関数
+        async function fetchWithProxy(apiUrl, timeout = 15000) {
+            const proxies = [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://api.codetabs.com/v1/proxy?quest='
+            ];
+            
+            let lastError = null;
+            
+            for (const proxyUrl of proxies) {
+                try {
+                    console.log(`Trying proxy: ${proxyUrl}`);
+                    
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeout);
+                    
+                    const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+                        method: 'GET',
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                } catch (error) {
+                    console.error(`Proxy ${proxyUrl} failed:`, error);
+                    lastError = error;
+                    continue;
+                }
+            }
+            
+            throw lastError || new Error('All proxies failed');
+        }
+
         // 新着動画を取得
         async function loadNewReleases() {
             try {
                 const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=12&output=json`;
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒に延長
-                
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
-                    method: 'GET',
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) throw new Error('API error');
-                
-                const data = await response.json();
+                const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
                     const products = data.result.items
@@ -505,20 +545,7 @@
             try {
                 const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=20&output=json`;
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒に延長
-                
-                const proxyUrl = 'https://api.allorigins.win/raw?url=';
-                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
-                    method: 'GET',
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) throw new Error('API error');
-                
-                const data = await response.json();
+                const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
                     const products = data.result.items
