@@ -237,10 +237,11 @@
         </header>
         
         <div class="filters">
-            <button class="filter-btn active" onclick="filterProducts('all')" id="filter-all">All</button>
-            <button class="filter-btn" onclick="filterProducts('new')" id="filter-new">New Arrivals</button>
-            <button class="filter-btn" onclick="filterProducts('sale')" id="filter-sale">On Sale</button>
-            <button class="filter-btn" onclick="filterProducts('popular')" id="filter-popular">Popular</button>
+            <button class="filter-btn active" onclick="filterByGenre('')" id="filter-all">すべて</button>
+            <button class="filter-btn" onclick="filterByGenre('5001')" id="filter-creampie">中出し</button>
+            <button class="filter-btn" onclick="filterByGenre('2001')" id="filter-bigbreasts">巨乳</button>
+            <button class="filter-btn" onclick="filterByGenre('1027')" id="filter-beauty">美少女</button>
+            <button class="filter-btn" onclick="filterByGenre('1031')" id="filter-slut">痴女</button>
         </div>
         
         <div id="products">
@@ -248,181 +249,234 @@
         </div>
     </div>
 
-    <script>
-        // Age verification check
-        if (localStorage.getItem('ageVerified') !== 'true') {
-            window.location.href = 'age-verify.html';
+    // Age verification check
+if (localStorage.getItem('ageVerified') !== 'true') {
+    window.location.href = 'age-verify.html';
+}
+
+const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
+const AFFILIATE_ID = 'yoru365-990';
+
+let allProducts = [];
+let currentLang = 'ja';
+let currentGenre = ''; // ジャンルフィルター用
+
+// Define translations FIRST
+const translations = {
+    ja: {
+        warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
+        title: '新着・おすすめ情報',
+        subtitle: '厳選されたアダルトコンテンツ',
+        filterAll: 'すべて',
+        filterCreampie: '中出し',
+        filterBigBreasts: '巨乳',
+        filterBeauty: '美少女',
+        filterSlut: '痴女',
+        newBadge: 'NEW',
+        viewDetails: '詳細を見る',
+        loading: '読み込み中...',
+        noContent: 'コンテンツが見つかりません',
+        error: 'エラーが発生しました'
+    },
+    en: {
+        warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
+        title: 'Latest Releases',
+        subtitle: 'Curated adult content recommendations',
+        filterAll: 'All',
+        filterCreampie: 'Creampie',
+        filterBigBreasts: 'Big Breasts',
+        filterBeauty: 'Beauty',
+        filterSlut: 'Slut',
+        newBadge: 'NEW',
+        viewDetails: 'View Details',
+        loading: 'Loading content...',
+        noContent: 'No content found',
+        error: 'Error loading content'
+    },
+    es: {
+        warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
+        title: 'Últimos Lanzamientos',
+        subtitle: 'Contenido para adultos seleccionado',
+        filterAll: 'Todo',
+        filterCreampie: 'Creampie',
+        filterBigBreasts: 'Pechos Grandes',
+        filterBeauty: 'Belleza',
+        filterSlut: 'Zorra',
+        newBadge: 'NUEVO',
+        viewDetails: 'Ver Detalles',
+        loading: 'Cargando contenido...',
+        noContent: 'No se encontró contenido',
+        error: 'Error al cargar contenido'
+    }
+};
+
+function updateUILanguage(lang) {
+    const t = translations[lang];
+    if (!t) return;
+    
+    document.getElementById('warning').textContent = t.warning;
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('subtitle').textContent = t.subtitle;
+    document.getElementById('filter-all').textContent = t.filterAll;
+    document.getElementById('filter-creampie').textContent = t.filterCreampie;
+    document.getElementById('filter-bigbreasts').textContent = t.filterBigBreasts;
+    document.getElementById('filter-beauty').textContent = t.filterBeauty;
+    document.getElementById('filter-slut').textContent = t.filterSlut;
+}
+
+function changeLanguage(lang) {
+    currentLang = lang;
+    
+    // Update language buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update UI
+    updateUILanguage(lang);
+    
+    // Save preference
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // Redisplay products with new language
+    if (allProducts.length > 0) {
+        displayProducts(allProducts);
+    }
+}
+
+// ジャンルフィルター関数
+async function filterByGenre(genreId) {
+    currentGenre = genreId;
+    
+    // ボタンのアクティブ状態を更新
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // ローディング表示
+    const t = translations[currentLang];
+    document.getElementById('products').innerHTML = `<div class="loading">${t.loading}</div>`;
+    
+    // 商品を再読み込み
+    await loadProducts();
+}
+
+async function loadProducts() {
+    try {
+        // FANZA APIのURL構築
+        let apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=24&output=json`;
+        
+        // ジャンルが指定されている場合
+        if (currentGenre) {
+            apiUrl += `&article=genre&article_id=${currentGenre}`;
         }
         
-        const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
-        const AFFILIATE_ID = 'yoru365-990';
+        // CORSプロキシ経由で取得
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
         
-        let allProducts = [];
-        let currentLang = 'ja';
-        
-        // Define translations FIRST
-        const translations = {
-            ja: {
-                warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
-                title: '新着・おすすめ情報',
-                subtitle: '厳選されたアダルトコンテンツ',
-                filterAll: 'すべて',
-                filterNew: '新着',
-                filterSale: 'セール中',
-                filterPopular: '人気',
-                newBadge: 'NEW',
-                viewDetails: '詳細を見る',
-                loading: '読み込み中...',
-                noContent: 'コンテンツが見つかりません',
-                error: 'エラーが発生しました'
-            },
-            en: {
-                warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
-                title: 'Latest Releases',
-                subtitle: 'Curated adult content recommendations',
-                filterAll: 'All',
-                filterNew: 'New Arrivals',
-                filterSale: 'On Sale',
-                filterPopular: 'Popular',
-                newBadge: 'NEW',
-                viewDetails: 'View Details',
-                loading: 'Loading content...',
-                noContent: 'No content found',
-                error: 'Error loading content'
-            },
-            es: {
-                warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
-                title: 'Últimos Lanzamientos',
-                subtitle: 'Contenido para adultos seleccionado',
-                filterAll: 'Todo',
-                filterNew: 'Nuevos',
-                filterSale: 'En Oferta',
-                filterPopular: 'Populares',
-                newBadge: 'NUEVO',
-                viewDetails: 'Ver Detalles',
-                loading: 'Cargando contenido...',
-                noContent: 'No se encontró contenido',
-                error: 'Error al cargar contenido'
-            }
-        };
-        
-        function updateUILanguage(lang) {
-            const t = translations[lang];
-            if (!t) return;
-            
-            document.getElementById('warning').textContent = t.warning;
-            document.getElementById('title').textContent = t.title;
-            document.getElementById('subtitle').textContent = t.subtitle;
-            document.getElementById('filter-all').textContent = t.filterAll;
-            document.getElementById('filter-new').textContent = t.filterNew;
-            document.getElementById('filter-sale').textContent = t.filterSale;
-            document.getElementById('filter-popular').textContent = t.filterPopular;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        function changeLanguage(lang) {
-            currentLang = lang;
-            
-            // Update language buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Update UI
-            updateUILanguage(lang);
-            
-            // Save preference
-            localStorage.setItem('preferredLanguage', lang);
-            
-            // Redisplay products with new language
-            if (allProducts.length > 0) {
-                displayProducts(allProducts);
-            }
-        }
+        const data = await response.json();
         
-        async function loadProducts() {
-            try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=24&output=json`;
-                
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                
-                if (data.result && data.result.items) {
-                    allProducts = data.result.items;
-                    displayProducts(allProducts);
-                } else {
-                    const t = translations[currentLang];
-                    document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                const t = translations[currentLang];
-                document.getElementById('products').innerHTML = `<p class="loading">${t.error}</p>`;
-            }
-        }
+        console.log('API Response:', data);
         
-        function displayProducts(products) {
-            const container = document.getElementById('products');
-            const t = translations[currentLang];
-            
-            if (!products || products.length === 0) {
-                container.innerHTML = `<p class="loading">${t.noContent}</p>`;
-                return;
-            }
-            
-            container.innerHTML = products.map(item => `
-                <div class="product">
-                    <div class="product-image-wrapper">
-                        <img src="${item.imageURL ? item.imageURL.large : ''}" 
-                             alt="${item.title}" 
-                             class="product-image"
-                             onerror="this.src='https://via.placeholder.com/260x364/0a0a0a/333333?text=No+Image'">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title">${item.title}</div>
-                        <div class="product-meta">
-                            <span class="new-badge">${t.newBadge}</span>
-                            <span class="product-price">¥${item.prices ? item.prices.price.toLocaleString() : '---'}</span>
-                        </div>
-                        <a href="${item.affiliateURL}" 
-                           class="product-link" 
-                           target="_blank" 
-                           rel="noopener noreferrer">
-                            ${t.viewDetails}
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function filterProducts(type) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+        if (data.result && data.result.items && data.result.items.length > 0) {
+            allProducts = data.result.items;
             displayProducts(allProducts);
+        } else {
+            const t = translations[currentLang];
+            document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
+        }
+    } catch (error) {
+        console.error('Error loading products:', error);
+        const t = translations[currentLang];
+        document.getElementById('products').innerHTML = `<p class="loading">${t.error}</p>`;
+    }
+}
+
+function displayProducts(products) {
+    const container = document.getElementById('products');
+    const t = translations[currentLang];
+    
+    if (!products || products.length === 0) {
+        container.innerHTML = `<p class="loading">${t.noContent}</p>`;
+        return;
+    }
+    
+    container.innerHTML = products.map(item => {
+        // 価格の取得
+        let price = '---';
+        if (item.prices && item.prices.price) {
+            price = item.prices.price;
         }
         
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get language from URL or localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
-            
-            // Set UI language
-            updateUILanguage(currentLang);
-            
-            // Set active language button
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('onclick').includes(`'${currentLang}'`)) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Load products
-            loadProducts();
-        });
-    </script>
+        // 画像URLの取得
+        let imageUrl = 'https://via.placeholder.com/260x364/0a0a0a/333333?text=No+Image';
+        if (item.imageURL && item.imageURL.large) {
+            imageUrl = item.imageURL.large;
+        }
+        
+        // アフィリエイトURLの取得
+        const affiliateUrl = item.affiliateURL || item.URL || '#';
+        
+        return `
+            <div class="product">
+                <div class="product-image-wrapper">
+                    <img src="${imageUrl}" 
+                         alt="${item.title || 'Product'}" 
+                         class="product-image"
+                         onerror="this.src='https://via.placeholder.com/260x364/0a0a0a/333333?text=No+Image'">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">${item.title || 'タイトル不明'}</div>
+                    <div class="product-meta">
+                        <span class="new-badge">${t.newBadge}</span>
+                        <span class="product-price">${price}</span>
+                    </div>
+                    <a href="${affiliateUrl}" 
+                       class="product-link" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        ${t.viewDetails}
+                    </a>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterProducts(type) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    displayProducts(allProducts);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Get language from URL or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
+    
+    // Set UI language
+    updateUILanguage(currentLang);
+    
+    // Set active language button
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${currentLang}'`)) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Load products
+    loadProducts();
+});
 </body>
 </html>
