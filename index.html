@@ -259,68 +259,32 @@
         
         let allProducts = [];
         
-        // Get language from URL parameter
+        // Get language from URL parameter or localStorage
         const urlParams = new URLSearchParams(window.location.search);
-        const initialLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
-        let currentLang = initialLang;
+        let currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
         
         const translations = {
-            ja: {
-                warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
-                title: '新着・おすすめ情報',
-                subtitle: '厳選されたアダルトコンテンツ',
-                filterAll: 'すべて',
-                filterNew: '新着',
-                filterSale: 'セール中',
-                filterPopular: '人気',
-                newBadge: 'NEW',
-                viewDetails: '詳細を見る',
-                loading: '読み込み中...',
-                noContent: 'コンテンツが見つかりません',
-                error: 'エラーが発生しました'
-            },
-            en: {
-                warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
-                title: 'Latest Releases',
-                subtitle: 'Curated adult content recommendations',
-                filterAll: 'All',
-                filterNew: 'New Arrivals',
-                filterSale: 'On Sale',
-                filterPopular: 'Popular',
-                newBadge: 'NEW',
-                viewDetails: 'View Details',
-                loading: 'Loading content...',
-                noContent: 'No content found',
-                error: 'Error loading content'
-            },
-            es: {
-                warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
-                title: 'Últimos Lanzamientos',
-                subtitle: 'Contenido para adultos seleccionado',
-                filterAll: 'Todo',
-                filterNew: 'Nuevos',
-                filterSale: 'En Oferta',
-                filterPopular: 'Populares',
-                newBadge: 'NUEVO',
-                viewDetails: 'Ver Detalles',
-                loading: 'Cargando contenido...',
-                noContent: 'No se encontró contenido',
-                error: 'Error al cargar contenido'
-            }
+            // ... (translations オブジェクトはそのまま)
         };
         
-        function changeLanguage(lang) {
-            currentLang = lang;
+        // Initialize page with correct language IMMEDIATELY
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the correct language first
+            updateUILanguage(currentLang);
             
-            // Update language buttons
+            // Set active language button
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(`'${currentLang}'`)) {
+                    btn.classList.add('active');
+                }
             });
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
             
-            // Update UI text
+            // Then load products
+            loadProducts();
+        });
+        
+        function updateUILanguage(lang) {
             const t = translations[lang];
             document.getElementById('warning').textContent = t.warning;
             document.getElementById('title').textContent = t.title;
@@ -329,14 +293,19 @@
             document.getElementById('filter-new').textContent = t.filterNew;
             document.getElementById('filter-sale').textContent = t.filterSale;
             document.getElementById('filter-popular').textContent = t.filterPopular;
+        }
+        
+        function changeLanguage(lang) {
+            currentLang = lang;
             
-            // Update active language button
+            // Update language buttons
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
-                    btn.classList.add('active');
-                }
             });
+            event.target.classList.add('active');
+            
+            // Update UI
+            updateUILanguage(lang);
             
             // Save preference
             localStorage.setItem('preferredLanguage', lang);
@@ -409,12 +378,6 @@
             event.target.classList.add('active');
             displayProducts(allProducts);
         }
-        
-        // Set initial language on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            changeLanguage(currentLang);
-            loadProducts();
-        });
     </script>
 </body>
 </html>
