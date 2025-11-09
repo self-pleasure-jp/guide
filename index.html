@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>セルフプレジャーガイド</title>
+    <title>Adult Content Guide</title>
     <style>
         * {
             margin: 0;
@@ -11,166 +11,205 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
         }
         .warning {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: #1a1a1a;
+            border-left: 4px solid #ff3366;
+            padding: 16px 24px;
+            margin: 20px;
+            font-size: 14px;
+            color: #cccccc;
         }
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            margin-bottom: 60px;
         }
         h1 {
-            text-align: center;
-            color: white;
-            font-size: 36px;
-            margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #666666;
+            font-weight: 300;
         }
         .filters {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #222222;
+            padding-bottom: 20px;
         }
         .filter-btn {
-            background: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            background: transparent;
+            border: 1px solid #333333;
+            color: #888888;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-color: #666666;
+            color: #ffffff;
         }
         .filter-btn.active {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-            color: white;
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
         }
         #products {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
         }
         .product {
-            background: white;
-            border-radius: 15px;
+            background: #111111;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
             transition: all 0.3s;
-            cursor: pointer;
+            border: 1px solid #1a1a1a;
         }
         .product:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            transform: translateY(-4px);
+            border-color: #333333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .product-image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 140%;
+            background: #0a0a0a;
+            overflow: hidden;
         }
         .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
-            background: #f0f0f0;
         }
         .product-info {
-            padding: 15px;
+            padding: 20px;
         }
         .product-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            height: 44px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            height: 42px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            color: #ffffff;
+        }
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
         .product-price {
-            font-size: 24px;
-            color: #e91e63;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 20px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .new-badge {
+            background: #ff3366;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .product-link {
             display: block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: #ffffff;
+            color: #000000;
             text-align: center;
             padding: 12px;
             border-radius: 8px;
             text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
         }
         .product-link:hover {
-            background: linear-gradient(135deg, #764ba2, #667eea);
+            background: #f0f0f0;
             transform: scale(1.02);
         }
         .loading {
             text-align: center;
-            color: white;
-            font-size: 20px;
-            padding: 50px;
+            color: #666666;
+            font-size: 16px;
+            padding: 80px 20px;
         }
-        .new-badge {
-            background: #ff4757;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 8px;
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            .filters {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .filters::-webkit-scrollbar {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="warning">
+        18+ CONTENT WARNING — This site contains adult material and is intended for adults only.
+    </div>
+    
     <div class="container">
-        <div class="warning">
-            ⚠️ 18歳未満の方は閲覧できません ⚠️
-        </div>
-        
-        <h1>🌸 新着・おすすめ情報 🌸</h1>
+        <header>
+            <h1>Latest Releases</h1>
+            <p class="subtitle">Curated adult content recommendations</p>
+        </header>
         
         <div class="filters">
-            <button class="filter-btn active" onclick="filterProducts('all')">すべて</button>
-            <button class="filter-btn" onclick="filterProducts('new')">新着</button>
-            <button class="filter-btn" onclick="filterProducts('sale')">セール</button>
-            <button class="filter-btn" onclick="filterProducts('popular')">人気</button>
+            <button class="filter-btn active" onclick="filterProducts('all')">All</button>
+            <button class="filter-btn" onclick="filterProducts('new')">New Arrivals</button>
+            <button class="filter-btn" onclick="filterProducts('sale')">On Sale</button>
+            <button class="filter-btn" onclick="filterProducts('popular')">Popular</button>
         </div>
         
         <div id="products">
-            <div class="loading">読み込み中...</div>
+            <div class="loading">Loading content...</div>
         </div>
     </div>
 
     <script>
         const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
-        const AFFILIATE_ID = 'a2BXCsL2MVUtUeuFBZ1h'; // あなたのアフィリエイトIDに変更
+        const AFFILIATE_ID = 'yoru365-990';
         
         let allProducts = [];
         
         async function loadProducts() {
             try {
-                // FANZA API - 新着動画を取得
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=20&output=json`;
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=24&output=json`;
                 
                 const response = await fetch(apiUrl);
                 const data = await response.json();
@@ -179,11 +218,11 @@
                     allProducts = data.result.items;
                     displayProducts(allProducts);
                 } else {
-                    document.getElementById('products').innerHTML = '<p class="loading">商品情報の取得に失敗しました</p>';
+                    document.getElementById('products').innerHTML = '<p class="loading">Failed to load content</p>';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('products').innerHTML = '<p class="loading">エラーが発生しました</p>';
+                document.getElementById('products').innerHTML = '<p class="loading">Error loading content</p>';
             }
         }
         
@@ -191,25 +230,29 @@
             const container = document.getElementById('products');
             
             if (!products || products.length === 0) {
-                container.innerHTML = '<p class="loading">商品が見つかりませんでした</p>';
+                container.innerHTML = '<p class="loading">No content found</p>';
                 return;
             }
             
             container.innerHTML = products.map(item => `
                 <div class="product">
-                    <img src="${item.imageURL ? item.imageURL.large : ''}" 
-                         alt="${item.title}" 
-                         class="product-image"
-                         onerror="this.src='https://via.placeholder.com/280x200?text=No+Image'">
+                    <div class="product-image-wrapper">
+                        <img src="${item.imageURL ? item.imageURL.large : ''}" 
+                             alt="${item.title}" 
+                             class="product-image"
+                             onerror="this.src='https://via.placeholder.com/260x364/0a0a0a/333333?text=No+Image'">
+                    </div>
                     <div class="product-info">
-                        <div class="new-badge">NEW</div>
                         <div class="product-title">${item.title}</div>
-                        <div class="product-price">¥${item.prices ? item.prices.price : '---'}</div>
+                        <div class="product-meta">
+                            <span class="new-badge">NEW</span>
+                            <span class="product-price">¥${item.prices ? item.prices.price.toLocaleString() : '---'}</span>
+                        </div>
                         <a href="${item.affiliateURL}" 
                            class="product-link" 
                            target="_blank" 
                            rel="noopener noreferrer">
-                            詳細を見る
+                            View Details
                         </a>
                     </div>
                 </div>
@@ -217,17 +260,13 @@
         }
         
         function filterProducts(type) {
-            // ボタンのアクティブ状態を更新
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
-            // フィルター処理（今は全て表示）
             displayProducts(allProducts);
         }
         
-        // ページ読み込み時に実行
         loadProducts();
     </script>
 </body>
