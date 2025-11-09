@@ -565,31 +565,43 @@
 
         // 画像フィルタリング関数
         function filterValidProducts(items, count) {
-            return items.filter(item => {
-                if (!item.imageURL) return false;
+            console.log(`Filter input: ${items.length} items`);
+            
+            const filtered = items.filter((item, index) => {
+                if (!item.imageURL) {
+                    console.log(`Item ${index}: No imageURL`);
+                    return false;
+                }
                 
                 const imageUrl = item.imageURL.large || item.imageURL.small;
-                if (!imageUrl) return false;
+                if (!imageUrl) {
+                    console.log(`Item ${index}: No large/small image`);
+                    return false;
+                }
                 
                 const urlLower = imageUrl.toLowerCase();
-                if (urlLower.includes('nowprinting') || 
-                    urlLower.includes('now_printing') ||
-                    urlLower.includes('noimage') ||
-                    urlLower.includes('no-image') ||
-                    urlLower.includes('dummy') ||
-                    urlLower.includes('comingsoon') ||
-                    urlLower.includes('/noimage/') ||
-                    urlLower.includes('pl.jpg')) {
+                
+                // 除外パターンチェック
+                const excludePatterns = ['nowprinting', 'now_printing', 'noimage', 'no-image', 'dummy', 'comingsoon', '/noimage/', 'pl.jpg'];
+                for (const pattern of excludePatterns) {
+                    if (urlLower.includes(pattern)) {
+                        console.log(`Item ${index}: Excluded by pattern "${pattern}" - ${imageUrl}`);
+                        return false;
+                    }
+                }
+                
+                // DMM画像サーバーチェック
+                if (!urlLower.includes('pics.dmm.co') && !urlLower.includes('pics.dmm.com')) {
+                    console.log(`Item ${index}: Not from pics.dmm - ${imageUrl}`);
                     return false;
                 }
                 
-                if (!urlLower.includes('pics.dmm.co') && 
-                    !urlLower.includes('pics.dmm.com')) {
-                    return false;
-                }
-                
+                console.log(`Item ${index}: ✓ Valid - ${imageUrl}`);
                 return true;
-            }).slice(0, count);
+            });
+            
+            console.log(`Filter output: ${filtered.length} valid items`);
+            return filtered.slice(0, count);
         }
 
         // ジャンル別ランキングを取得
@@ -633,18 +645,22 @@
         // 女優別作品を取得
         async function loadActressWorks(actressId, containerId, count = 6) {
             try {
+                console.log(`Loading actress ${actressId} for ${containerId}`);
                 const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=actress&article_id=${actressId}&sort=review&hits=30&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
+                console.log(`Actress ${actressId} response:`, data);
                 
-                if (data.result && data.result.items) {
+                if (data.result && data.result.items && data.result.items.length > 0) {
                     const products = filterValidProducts(data.result.items, count);
+                    console.log(`Actress ${actressId} filtered: ${products.length} products`);
                     displayProducts(containerId, products, false);
                 } else {
+                    console.log(`Actress ${actressId}: No items in response`);
                     showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error(`Error loading actress ${actressId}:`, error);
                 showError(containerId, 'エラーが発生しました');
             }
         }
