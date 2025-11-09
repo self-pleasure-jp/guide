@@ -517,12 +517,20 @@
         // 新着動画を取得
         async function loadNewReleases() {
             try {
-                // 多めに取得してフィルタリング（12→20件に増加）
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=20&output=json`;
+                // さらに多めに取得（20→50件）
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=50&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
+                    console.log('Total items received:', data.result.items.length);
+                    
+                    // 画像URLをチェック
+                    data.result.items.slice(0, 5).forEach((item, i) => {
+                        const imgUrl = item.imageURL?.large || item.imageURL?.small;
+                        console.log(`Item ${i}: ${imgUrl}`);
+                    });
+                    
                     const products = data.result.items
                         .filter(item => {
                             // 画像URLが存在するか確認
@@ -531,10 +539,22 @@
                             const imageUrl = item.imageURL.large || item.imageURL.small;
                             if (!imageUrl) return false;
                             
-                            // NOW PRINTINGのダミー画像を除外
-                            if (imageUrl.includes('nowprinting') || 
-                                imageUrl.includes('now_printing') ||
-                                imageUrl.includes('noimage')) {
+                            // URLに問題がある画像を除外（より広範囲）
+                            const urlLower = imageUrl.toLowerCase();
+                            if (urlLower.includes('nowprinting') || 
+                                urlLower.includes('now_printing') ||
+                                urlLower.includes('noimage') ||
+                                urlLower.includes('no-image') ||
+                                urlLower.includes('dummy') ||
+                                urlLower.includes('comingsoon')) {
+                                console.log('Filtered out:', imageUrl);
+                                return false;
+                            }
+                            
+                            // DMM/FANZAの正規の画像サーバーかチェック
+                            if (!urlLower.includes('pics.dmm.co') && 
+                                !urlLower.includes('pics.dmm.com')) {
+                                console.log('Not from pics.dmm:', imageUrl);
                                 return false;
                             }
                             
@@ -542,6 +562,7 @@
                         })
                         .slice(0, 6);
                     
+                    console.log('Filtered products:', products.length);
                     displayProducts('new-releases', products, false);
                 } else {
                     showError('new-releases', translations[currentLang].noContent);
@@ -559,12 +580,14 @@
         // ジャンル別ランキングを取得（中出しジャンル）
         async function loadGenreRanking() {
             try {
-                // 多めに取得してフィルタリング（20→30件に増加）
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=30&output=json`;
+                // さらに多めに取得（30→50件）
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=50&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
+                    console.log('Total genre items received:', data.result.items.length);
+                    
                     const products = data.result.items
                         .filter(item => {
                             // 画像URLが存在するか確認
@@ -573,10 +596,20 @@
                             const imageUrl = item.imageURL.large || item.imageURL.small;
                             if (!imageUrl) return false;
                             
-                            // NOW PRINTINGのダミー画像を除外
-                            if (imageUrl.includes('nowprinting') || 
-                                imageUrl.includes('now_printing') ||
-                                imageUrl.includes('noimage')) {
+                            // URLに問題がある画像を除外
+                            const urlLower = imageUrl.toLowerCase();
+                            if (urlLower.includes('nowprinting') || 
+                                urlLower.includes('now_printing') ||
+                                urlLower.includes('noimage') ||
+                                urlLower.includes('no-image') ||
+                                urlLower.includes('dummy') ||
+                                urlLower.includes('comingsoon')) {
+                                return false;
+                            }
+                            
+                            // DMM/FANZAの正規の画像サーバーかチェック
+                            if (!urlLower.includes('pics.dmm.co') && 
+                                !urlLower.includes('pics.dmm.com')) {
                                 return false;
                             }
                             
@@ -584,6 +617,7 @@
                         })
                         .slice(0, 10);
                     
+                    console.log('Filtered genre products:', products.length);
                     displayProducts('genre-ranking', products, true);
                 } else {
                     showError('genre-ranking', translations[currentLang].noContent);
