@@ -240,11 +240,11 @@
         </header>
         
         <div class="filters">
-            <button class="filter-btn active" onclick="filterByGenre('')" id="filter-all">すべて</button>
-            <button class="filter-btn" onclick="filterByGenre('5001')" id="filter-creampie">中出し</button>
-            <button class="filter-btn" onclick="filterByGenre('2001')" id="filter-bigbreasts">巨乳</button>
-            <button class="filter-btn" onclick="filterByGenre('1027')" id="filter-beauty">美少女</button>
-            <button class="filter-btn" onclick="filterByGenre('1031')" id="filter-slut">痴女</button>
+            <button class="filter-btn active" data-genre="" id="filter-all">すべて</button>
+            <button class="filter-btn" data-genre="5001" id="filter-creampie">中出し</button>
+            <button class="filter-btn" data-genre="2001" id="filter-bigbreasts">巨乳</button>
+            <button class="filter-btn" data-genre="1027" id="filter-beauty">美少女</button>
+            <button class="filter-btn" data-genre="1031" id="filter-slut">痴女</button>
         </div>
         
         <div id="products">
@@ -478,8 +478,48 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.classList.add('active');
         }
     });
+
+    // ジャンルフィルターボタンにイベントリスナーを追加
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const genreId = this.getAttribute('data-genre');
+            currentGenre = genreId;
+            
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            const t = translations[currentLang];
+            document.getElementById('products').innerHTML = `<div class="loading">${t.loading}</div>`;
+            
+            await loadProducts();
+        });
+    });
     
-    // Load products
+    // 言語ボタンにイベントリスナーを追加
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.textContent === '日本語' ? 'ja' : 
+                         this.textContent === 'English' ? 'en' : 'es';
+            
+            currentLang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            updateUILanguage(lang);
+            localStorage.setItem('preferredLanguage', lang);
+            
+            if (allProducts.length > 0) {
+                displayProducts(allProducts);
+            }
+        });
+    });
+    
+    // 既存のloadProducts()呼び出し...
     loadProducts();
 });
 </body>
