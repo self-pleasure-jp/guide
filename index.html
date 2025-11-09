@@ -264,27 +264,28 @@
             { 
                 text: '熟女', 
                 genreId: '1014',
-                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=1014/sort=date/' 
+                // アフィリエイトリンク形式で直接指定
+                affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1014%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: '人妻', 
                 genreId: '1039',
-                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=1039/sort=date/' 
+                affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1039%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: '中出し', 
                 genreId: '5001',
-                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=5001/sort=date/' 
+                affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D5001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: '寝取り', 
                 genreId: '4111',
-                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=4111/sort=date/' 
+                affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D4111%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: '巨乳', 
                 genreId: '2001',
-                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=2001/sort=date/' 
+                affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D2001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             }
         ];
         
@@ -301,15 +302,12 @@
             document.getElementById('main-title').textContent = `${year}年${month}月${day}日の人気無料エロ動画`;
         }
 
-        // キーワードリンクを生成（LITEVIDEO へのアフィリエイトリンク）
+        // キーワードリンクを生成
         function generateKeywordLinks() {
             const container = document.getElementById('keyword-links');
             container.innerHTML = KEYWORDS.map(keyword => {
-                // アフィリエイトリンクに変換
-                const affiliateUrl = `https://al.fanza.co.jp/link.php?aff_id=${AFFILIATE_ID}&cid=af_linkbanner_txt&sid=004&pcode=&link=${encodeURIComponent(keyword.liteVideoUrl)}`;
-                
                 return `
-                    <a href="${affiliateUrl}" 
+                    <a href="${keyword.affiliateUrl}" 
                        class="keyword-link keyword-${keyword.text}" 
                        target="_blank" 
                        rel="noopener noreferrer">
