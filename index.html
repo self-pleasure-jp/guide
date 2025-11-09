@@ -313,6 +313,8 @@ const translations = {
     }
 };
 
+// translationsオブジェクトの後に追加
+
 function updateUILanguage(lang) {
     const t = translations[lang];
     if (!t) return;
@@ -330,39 +332,30 @@ function updateUILanguage(lang) {
 function changeLanguage(lang) {
     currentLang = lang;
     
-    // Update language buttons
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
     
-    // Update UI
     updateUILanguage(lang);
-    
-    // Save preference
     localStorage.setItem('preferredLanguage', lang);
     
-    // Redisplay products with new language
     if (allProducts.length > 0) {
         displayProducts(allProducts);
     }
 }
 
-// ジャンルフィルター関数
 async function filterByGenre(genreId) {
     currentGenre = genreId;
     
-    // ボタンのアクティブ状態を更新
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
     
-    // ローディング表示
     const t = translations[currentLang];
     document.getElementById('products').innerHTML = `<div class="loading">${t.loading}</div>`;
     
-    // 商品を再読み込み
     await loadProducts();
 }
 
