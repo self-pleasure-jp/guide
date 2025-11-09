@@ -390,11 +390,11 @@
                 warning: '⚠️ 18歳未満の方は閲覧できません',
                 titleTemplate: '{year}年{month}月{day}日の人気無料エロ動画',
                 fanzaTvBtn: '📺 FANZA TV で見放題を楽しむ',
-                keywordSectionTitle: '無料動画を探す',
+                keywordSectionTitle: '新着の無料動画を探す',
                 freeIcon: 'FREE',
                 newReleasesTitle: '新着動画 TOP 6',
                 genreRankingTitle: 'ジャンル別ランキング TOP 10',
-                viewDetails: '詳細を見る',
+                viewDetails: 'サンプル動画を見る',
                 loadingNew: '読み込み中...',
                 loadingGenre: '読み込み中...',
                 noContent: 'コンテンツが見つかりません'
@@ -403,11 +403,11 @@
                 warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
                 titleTemplate: 'Popular Free Adult Videos - {month}/{day}/{year}',
                 fanzaTvBtn: '📺 Watch Unlimited on FANZA TV',
-                keywordSectionTitle: 'Find Free Videos',
+                keywordSectionTitle: 'Find New Free Videos',
                 freeIcon: 'FREE',
                 newReleasesTitle: 'New Releases TOP 6',
                 genreRankingTitle: 'Genre Ranking TOP 10',
-                viewDetails: 'View Details',
+                viewDetails: 'Watch Sample',
                 loadingNew: 'Loading...',
                 loadingGenre: 'Loading...',
                 noContent: 'No content found'
@@ -416,11 +416,11 @@
                 warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
                 titleTemplate: 'Videos Adultos Gratis Populares - {day}/{month}/{year}',
                 fanzaTvBtn: '📺 Ver Ilimitado en FANZA TV',
-                keywordSectionTitle: 'Buscar Videos Gratis',
+                keywordSectionTitle: 'Buscar Nuevos Videos Gratis',
                 freeIcon: 'GRATIS',
                 newReleasesTitle: 'Nuevos Lanzamientos TOP 6',
                 genreRankingTitle: 'Ranking por Género TOP 10',
-                viewDetails: 'Ver Detalles',
+                viewDetails: 'Ver Muestra',
                 loadingNew: 'Cargando...',
                 loadingGenre: 'Cargando...',
                 noContent: 'No se encontró contenido'
@@ -517,13 +517,29 @@
         // 新着動画を取得
         async function loadNewReleases() {
             try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=12&output=json`;
+                // 多めに取得してフィルタリング（12→20件に増加）
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=20&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
                     const products = data.result.items
-                        .filter(item => item.imageURL && (item.imageURL.large || item.imageURL.small))
+                        .filter(item => {
+                            // 画像URLが存在するか確認
+                            if (!item.imageURL) return false;
+                            
+                            const imageUrl = item.imageURL.large || item.imageURL.small;
+                            if (!imageUrl) return false;
+                            
+                            // NOW PRINTINGのダミー画像を除外
+                            if (imageUrl.includes('nowprinting') || 
+                                imageUrl.includes('now_printing') ||
+                                imageUrl.includes('noimage')) {
+                                return false;
+                            }
+                            
+                            return true;
+                        })
                         .slice(0, 6);
                     
                     displayProducts('new-releases', products, false);
@@ -543,13 +559,29 @@
         // ジャンル別ランキングを取得（中出しジャンル）
         async function loadGenreRanking() {
             try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=20&output=json`;
+                // 多めに取得してフィルタリング（20→30件に増加）
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=30&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
                     const products = data.result.items
-                        .filter(item => item.imageURL && (item.imageURL.large || item.imageURL.small))
+                        .filter(item => {
+                            // 画像URLが存在するか確認
+                            if (!item.imageURL) return false;
+                            
+                            const imageUrl = item.imageURL.large || item.imageURL.small;
+                            if (!imageUrl) return false;
+                            
+                            // NOW PRINTINGのダミー画像を除外
+                            if (imageUrl.includes('nowprinting') || 
+                                imageUrl.includes('now_printing') ||
+                                imageUrl.includes('noimage')) {
+                                return false;
+                            }
+                            
+                            return true;
+                        })
                         .slice(0, 10);
                     
                     displayProducts('genre-ranking', products, true);
