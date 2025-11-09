@@ -258,34 +258,58 @@
         const AFFILIATE_ID = 'yoru365-990';
         
         let allProducts = [];
+        let currentLang = 'ja';
         
-        // Get language from URL parameter or localStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        let currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
-        
+        // Define translations FIRST
         const translations = {
-            // ... (translations オブジェクトはそのまま)
+            ja: {
+                warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
+                title: '新着・おすすめ情報',
+                subtitle: '厳選されたアダルトコンテンツ',
+                filterAll: 'すべて',
+                filterNew: '新着',
+                filterSale: 'セール中',
+                filterPopular: '人気',
+                newBadge: 'NEW',
+                viewDetails: '詳細を見る',
+                loading: '読み込み中...',
+                noContent: 'コンテンツが見つかりません',
+                error: 'エラーが発生しました'
+            },
+            en: {
+                warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
+                title: 'Latest Releases',
+                subtitle: 'Curated adult content recommendations',
+                filterAll: 'All',
+                filterNew: 'New Arrivals',
+                filterSale: 'On Sale',
+                filterPopular: 'Popular',
+                newBadge: 'NEW',
+                viewDetails: 'View Details',
+                loading: 'Loading content...',
+                noContent: 'No content found',
+                error: 'Error loading content'
+            },
+            es: {
+                warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
+                title: 'Últimos Lanzamientos',
+                subtitle: 'Contenido para adultos seleccionado',
+                filterAll: 'Todo',
+                filterNew: 'Nuevos',
+                filterSale: 'En Oferta',
+                filterPopular: 'Populares',
+                newBadge: 'NUEVO',
+                viewDetails: 'Ver Detalles',
+                loading: 'Cargando contenido...',
+                noContent: 'No se encontró contenido',
+                error: 'Error al cargar contenido'
+            }
         };
-        
-        // Initialize page with correct language IMMEDIATELY
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set the correct language first
-            updateUILanguage(currentLang);
-            
-            // Set active language button
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('onclick').includes(`'${currentLang}'`)) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Then load products
-            loadProducts();
-        });
         
         function updateUILanguage(lang) {
             const t = translations[lang];
+            if (!t) return;
+            
             document.getElementById('warning').textContent = t.warning;
             document.getElementById('title').textContent = t.title;
             document.getElementById('subtitle').textContent = t.subtitle;
@@ -378,6 +402,27 @@
             event.target.classList.add('active');
             displayProducts(allProducts);
         }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get language from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
+            
+            // Set UI language
+            updateUILanguage(currentLang);
+            
+            // Set active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(`'${currentLang}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Load products
+            loadProducts();
+        });
     </script>
 </body>
 </html>
