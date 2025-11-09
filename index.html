@@ -73,7 +73,7 @@
             color: #ffffff;
         }
         
-        /* キーワードリンクセクション（無料動画） */
+        /* キーワードリンクセクション */
         .keyword-section {
             background: linear-gradient(135deg, #1a1a1a 0%, #0f2027 100%);
             border-radius: 8px;
@@ -129,18 +129,17 @@
             color: #ffffff;
         }
         
-        /* 新着動画（6個） */
-        .products-grid-6 {
+        /* 商品グリッド */
+        .products-grid-10 {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             margin-bottom: 40px;
         }
         
-        /* ジャンル別ランキング（10個） */
-        .products-grid-10 {
+        .products-grid-6 {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -218,6 +217,33 @@
         .product-link:hover {
             background: #f0f0f0;
         }
+        
+        /* 50音ジャンル一覧 */
+        .genre-list {
+            background: #111111;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+        }
+        .genre-item {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #cccccc;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .genre-item:hover {
+            background: #ff3366;
+            color: #ffffff;
+        }
+        
         .credit {
             text-align: center;
             margin: 50px 0 20px 0;
@@ -266,24 +292,16 @@
                 justify-content: center;
                 width: fit-content;
             }
-            .products-grid-6 {
+            .products-grid-10, .products-grid-6 {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
-            .products-grid-10 {
+            .genre-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
             }
             h1 {
                 font-size: 22px;
                 margin-top: 20px;
-            }
-            .keyword-links {
-                gap: 8px;
-            }
-            .keyword-link {
-                padding: 8px 16px;
-                font-size: 13px;
             }
         }
     </style>
@@ -312,29 +330,78 @@
             </a>
         </div>
         
-        <!-- 無料動画キーワードリンクセクション -->
+        <!-- 無料動画キーワードリンク -->
         <div class="keyword-section">
             <div class="keyword-title" id="keyword-section-title">
-                無料動画を探す
+                新着の無料動画を探す
                 <span class="free-icon">FREE</span>
             </div>
             <div class="keyword-links" id="keyword-links"></div>
         </div>
-        
-        <h2 class="section-title" id="new-releases-title">新着動画 TOP 6</h2>
-        <div id="new-releases" class="products-grid-6">
-            <div class="loading">
-                <div class="spinner"></div>
-                <div id="loading-new">読み込み中...</div>
-            </div>
+
+        <!-- 中出しランキング -->
+        <h2 class="section-title">🔥 中出しランキング TOP 10</h2>
+        <div id="creampie-ranking" class="products-grid-10">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
-        <h2 class="section-title" id="genre-ranking-title">ジャンル別ランキング TOP 10</h2>
-        <div id="genre-ranking" class="products-grid-10">
-            <div class="loading">
-                <div class="spinner"></div>
-                <div id="loading-genre">読み込み中...</div>
-            </div>
+        <!-- 巨乳ランキング -->
+        <h2 class="section-title">👙 巨乳ランキング TOP 10</h2>
+        <div id="bigbreasts-ranking" class="products-grid-10">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <!-- 熟女ランキング -->
+        <h2 class="section-title">💋 熟女ランキング TOP 10</h2>
+        <div id="milf-ranking" class="products-grid-10">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <!-- チャンネルガイド -->
+        <h2 class="section-title">📺 チャンネルガイド</h2>
+        
+        <h3 class="section-title" style="font-size: 18px;">素人 TOP 10 - 評価の高い順</h3>
+        <div id="amateur-review" class="products-grid-10">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <h3 class="section-title" style="font-size: 18px;">アニメ TOP 10 - 新着順</h3>
+        <div id="anime-new" class="products-grid-10">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <!-- 女優別 -->
+        <h2 class="section-title">⭐ 人気女優 出演作品</h2>
+        
+        <h3 class="section-title" style="font-size: 18px;">松本いちか 出演作品 TOP 6</h3>
+        <div id="actress-1054998" class="products-grid-6">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <h3 class="section-title" style="font-size: 18px;">美園和花 出演作品 TOP 6</h3>
+        <div id="actress-1135554" class="products-grid-6">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <h3 class="section-title" style="font-size: 18px;">沙月恵奈 出演作品 TOP 6</h3>
+        <div id="actress-1073158" class="products-grid-6">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <h3 class="section-title" style="font-size: 18px;">弥生みづき 出演作品 TOP 6</h3>
+        <div id="actress-1050071" class="products-grid-6">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <h3 class="section-title" style="font-size: 18px;">逢沢みゆ 出演作品 TOP 6</h3>
+        <div id="actress-1107799" class="products-grid-6">
+            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
+        </div>
+
+        <!-- 50音ジャンル一覧 -->
+        <h2 class="section-title">📋 全ジャンル一覧（50音順）</h2>
+        <div class="genre-list">
+            <div class="genre-grid" id="genre-list"></div>
         </div>
 
         <div class="credit">
@@ -354,34 +421,33 @@
 
         let currentLang = 'ja';
 
-        // ★★★ キーワード設定（ここだけ編集すればOK！） ★★★
-        // 配列の順番 = 表示順です
+        // キーワード設定
         const KEYWORDS = [
             { 
                 text: { ja: '熟女', en: 'MILF', es: 'Mujer Madura' },
-                genreId: '1014',
                 affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1014%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: { ja: '人妻', en: 'Married Woman', es: 'Mujer Casada' },
-                genreId: '1039',
                 affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1039%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: { ja: '中出し', en: 'Creampie', es: 'Creampie' },
-                genreId: '5001',
                 affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D5001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: { ja: '寝取り', en: 'Cuckold', es: 'Cornudo' },
-                genreId: '4111',
                 affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D4111%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             },
             { 
                 text: { ja: '巨乳', en: 'Big Breasts', es: 'Pechos Grandes' },
-                genreId: '2001',
                 affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D2001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link'
             }
+        ];
+
+        // 全ジャンルリスト（50音順）
+        const ALL_GENRES = [
+            'アイドル・芸能人', 'アクション・格闘', 'アクメ・オーガズム', 'アジア女優', '足コキ', '脚フェチ', 'アスリート', '汗だく', 'アナル', 'アナルセックス', 'アニメ', '姉・妹', 'イタズラ', '異物挿入', 'イメージビデオ', 'イメージビデオ（男性）', 'イラマチオ', '淫語', 'インストラクター', 'インディーズ', '飲尿', '淫乱・ハード系', 'ウェイトレス', '受付嬢', 'AI生成作品', 'SF', 'SM', 'エステ', 'M男', 'M女', 'OL', 'お母さん', '女将・女主人', '幼なじみ', 'お爺ちゃん', 'お嬢様・令嬢', 'オタク', '男の潮吹き', 'オナサポ', 'オナニー', 'お姉さん', 'お婆ちゃん', '叔母さん', 'お姫様', 'お風呂', 'おもちゃ', '温泉', '女教師', '女上司', '女戦士', '女捜査官', 'カーセックス', '学園もの', '学生服', '格闘家', 'カップル', '家庭教師', '監禁', '看護婦・ナース', '顔射', '浣腸', '顔面騎乗', '企画', '騎乗位', 'キス・接吻', '鬼畜', '義母', 'ギャグ・コメディ', '逆ナン', 'キャバ嬢・風俗嬢', 'ギャル', 'キャンギャル', '競泳・スクール水着', '局部アップ', '巨尻', '巨乳', '巨乳フェチ', 'ギリモザ', '近親相姦', '筋肉', 'くすぐり', 'クスコ', 'くノ一', 'クラシック', 'クンニ', 'ゲイ', 'ゲーム実写版', 'ゲロ', '原作コラボ', '拘束', '拷問', '小柄', '黒人男優', '極道・任侠', 'コスプレ', 'ごっくん', 'コラボ作品', 'コンパニオン', 'サイコ・スリラー', '残虐表現', '3P・4P', '潮吹き', '時間停止', 'シックスナイン', '縛り・緊縛', '羞恥', '16時間以上作品', '主観', '熟女', '女医', '女王様', '職業色々', '触手', '食糞', '女子アナ', '女子校生', '女子大生', '処女', '女性向け', '女装・男の娘', 'ショタ', '女優ベスト・総集編', '尻フェチ', '素人', '白目・失神', 'スカトロ', 'スチュワーデス', 'スパンキング', 'スポーツ', 'スマホ推奨縦動画', '3D', 'スレンダー', 'スワッピング・夫婦交換', '性転換・女体化', '制服', 'セーラー服', 'セクシー', 'セット商品', 'セレブ', '早漏', '即ハメ', 'そっくりさん', 'その他', 'その他フェチ', 'ダーク系', '体験告白', '体操着・ブルマ', '台湾モデル', '脱糞', 'ダンス', '単体作品', 'チアガール', '痴女', 'チャイナドレス', '着エロ', '長身', '超乳', 'ツンデレ', 'ディルド', 'デート', 'デカチン・巨根', '手コキ', 'デジモ', 'デビュー作品', '電マ', '投稿', '盗撮・のぞき', '童貞', 'ドール', 'ドキュメンタリー', '特撮', '独占配信', 'ドラッグ', 'ドラマ', '中出し', '軟体', 'ナンパ', 'ニーソックス', 'ニューハーフ', '妊婦', 'ネコミミ・獣系', '寝取り・寝取られ・NTR', 'ノーパン', 'ノーブラ', '飲み会・合コン', 'ハーレム', 'ハイクオリティVR', 'パイズリ', 'パイパン', 'ハイビジョン', 'バイブ', 'How To', '白人女優', 'バスガイド', '辱め', '裸エプロン', '8KVR', 'バック', '罵倒', '鼻フック', '花嫁', 'バニーガール', 'ハメ撮り', '孕ませ', 'パンスト・タイツ', 'パンチラ', 'ビジネススーツ', '秘書', '美少女', 'ビッチ', '人妻・主婦', '美乳', '日焼け', '病院・クリニック', '貧乳・微乳', 'ファン感謝・訪問', 'FANZA配信限定', 'ファンタジー', 'VR専用', 'Vシネマ', 'フィスト', 'フェラ', '部活・マネージャー', '部下・同僚', '複数話', '福袋', '覆面・マスク', 'ふたなり', 'ぶっかけ', '復刻', '不倫', 'ベスト・総集編', 'ヘルス・ソープ', '変身ヒロイン', '放置', '放尿・お漏らし', 'BL（ボーイズラブ）', 'ぽっちゃり', 'ボディコン', 'ホテル', '母乳', 'ホラー', 'ポルチオ', 'ボンテージ', 'マッサージ・リフレ', '魔法少女', 'ママ友', '巫女', '水着', 'ミニ系', 'ミニスカ', 'ミニスカポリス', '未亡人', '娘・養女', '胸チラ', 'メイド', 'めがね', '面接', '妄想', 'モデル', '野外・露出', '指マン', '洋ピン・海外輸入', 'ヨガ', '4時間以上作品', '4K', 'ラブコメ', '乱交', 'ランジェリー', '旅行', 'ルーズソックス', 'レースクィーン', 'レオタード', 'レズキス', 'レズビアン', '恋愛', '蝋燭', 'ローション・オイル', 'ローター', '若妻・幼妻', '和服・浴衣'
         ];
 
         // 多言語翻訳
@@ -392,12 +458,7 @@
                 fanzaTvBtn: '📺 FANZA TV で見放題を楽しむ',
                 keywordSectionTitle: '新着の無料動画を探す',
                 freeIcon: 'FREE',
-                newReleasesTitle: '新着動画 TOP 6',
-                genreRankingTitle: 'ジャンル別ランキング TOP 10',
-                viewDetails: 'サンプル動画を見る',
-                loadingNew: '読み込み中...',
-                loadingGenre: '読み込み中...',
-                noContent: 'コンテンツが見つかりません'
+                viewDetails: 'サンプル動画を見る'
             },
             en: {
                 warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
@@ -405,12 +466,7 @@
                 fanzaTvBtn: '📺 Watch Unlimited on FANZA TV',
                 keywordSectionTitle: 'Find New Free Videos',
                 freeIcon: 'FREE',
-                newReleasesTitle: 'New Releases TOP 6',
-                genreRankingTitle: 'Genre Ranking TOP 10',
-                viewDetails: 'Watch Sample',
-                loadingNew: 'Loading...',
-                loadingGenre: 'Loading...',
-                noContent: 'No content found'
+                viewDetails: 'Watch Sample'
             },
             es: {
                 warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
@@ -418,16 +474,10 @@
                 fanzaTvBtn: '📺 Ver Ilimitado en FANZA TV',
                 keywordSectionTitle: 'Buscar Nuevos Videos Gratis',
                 freeIcon: 'GRATIS',
-                newReleasesTitle: 'Nuevos Lanzamientos TOP 6',
-                genreRankingTitle: 'Ranking por Género TOP 10',
-                viewDetails: 'Ver Muestra',
-                loadingNew: 'Cargando...',
-                loadingGenre: 'Cargando...',
-                noContent: 'No se encontró contenido'
+                viewDetails: 'Ver Muestra'
             }
         };
 
-        // 日付表示を更新
         function updateDate() {
             const today = new Date();
             const year = today.getFullYear();
@@ -443,7 +493,6 @@
             document.getElementById('main-title').textContent = title;
         }
 
-        // UIの言語を更新
         function updateUILanguage(lang) {
             currentLang = lang;
             const t = translations[lang];
@@ -453,15 +502,10 @@
             document.getElementById('fanza-tv-btn').textContent = t.fanzaTvBtn;
             document.getElementById('keyword-section-title').innerHTML = 
                 `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
-            document.getElementById('new-releases-title').textContent = t.newReleasesTitle;
-            document.getElementById('genre-ranking-title').textContent = t.genreRankingTitle;
-            document.getElementById('loading-new').textContent = t.loadingNew;
-            document.getElementById('loading-genre').textContent = t.loadingGenre;
             
             generateKeywordLinks();
         }
 
-        // キーワードリンクを生成
         function generateKeywordLinks() {
             const container = document.getElementById('keyword-links');
             container.innerHTML = KEYWORDS.map(keyword => {
@@ -477,7 +521,15 @@
             }).join('');
         }
 
-        // 複数のプロキシを試す関数
+        // 50音ジャンル一覧を生成
+        function generateGenreList() {
+            const container = document.getElementById('genre-list');
+            container.innerHTML = ALL_GENRES.map(genre => {
+                return `<div class="genre-item">${genre}</div>`;
+            }).join('');
+        }
+
+        // 複数プロキシを試す関数
         async function fetchWithProxy(apiUrl, timeout = 15000) {
             const proxies = [
                 'https://api.allorigins.win/raw?url=',
@@ -489,8 +541,6 @@
             
             for (const proxyUrl of proxies) {
                 try {
-                    console.log(`Trying proxy: ${proxyUrl}`);
-                    
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), timeout);
                     
@@ -505,7 +555,6 @@
                         return await response.json();
                     }
                 } catch (error) {
-                    console.error(`Proxy ${proxyUrl} failed:`, error);
                     lastError = error;
                     continue;
                 }
@@ -514,121 +563,89 @@
             throw lastError || new Error('All proxies failed');
         }
 
-        // 新着動画を取得
-        async function loadNewReleases() {
+        // 画像フィルタリング関数
+        function filterValidProducts(items, count) {
+            return items.filter(item => {
+                if (!item.imageURL) return false;
+                
+                const imageUrl = item.imageURL.large || item.imageURL.small;
+                if (!imageUrl) return false;
+                
+                const urlLower = imageUrl.toLowerCase();
+                if (urlLower.includes('nowprinting') || 
+                    urlLower.includes('now_printing') ||
+                    urlLower.includes('noimage') ||
+                    urlLower.includes('no-image') ||
+                    urlLower.includes('dummy') ||
+                    urlLower.includes('comingsoon') ||
+                    urlLower.includes('/noimage/') ||
+                    urlLower.includes('pl.jpg')) {
+                    return false;
+                }
+                
+                if (!urlLower.includes('pics.dmm.co') && 
+                    !urlLower.includes('pics.dmm.com')) {
+                    return false;
+                }
+                
+                return true;
+            }).slice(0, count);
+        }
+
+        // ジャンル別ランキングを取得
+        async function loadGenreRanking(genreId, containerId, count = 10) {
             try {
-                // さらに多めに取得（20→50件）
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=50&output=json`;
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=${genreId}&hits=50&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
-                    console.log('Total items received:', data.result.items.length);
-                    
-                    // 画像URLをチェック
-                    data.result.items.slice(0, 5).forEach((item, i) => {
-                        const imgUrl = item.imageURL?.large || item.imageURL?.small;
-                        console.log(`Item ${i}: ${imgUrl}`);
-                    });
-                    
-                    const products = data.result.items
-                        .filter(item => {
-                            // 画像URLが存在するか確認
-                            if (!item.imageURL) return false;
-                            
-                            const imageUrl = item.imageURL.large || item.imageURL.small;
-                            if (!imageUrl) return false;
-                            
-                            // URLに問題がある画像を除外（より広範囲）
-                            const urlLower = imageUrl.toLowerCase();
-                            if (urlLower.includes('nowprinting') || 
-                                urlLower.includes('now_printing') ||
-                                urlLower.includes('noimage') ||
-                                urlLower.includes('no-image') ||
-                                urlLower.includes('dummy') ||
-                                urlLower.includes('comingsoon')) {
-                                console.log('Filtered out:', imageUrl);
-                                return false;
-                            }
-                            
-                            // DMM/FANZAの正規の画像サーバーかチェック
-                            if (!urlLower.includes('pics.dmm.co') && 
-                                !urlLower.includes('pics.dmm.com')) {
-                                console.log('Not from pics.dmm:', imageUrl);
-                                return false;
-                            }
-                            
-                            return true;
-                        })
-                        .slice(0, 6);
-                    
-                    console.log('Filtered products:', products.length);
-                    displayProducts('new-releases', products, false);
+                    const products = filterValidProducts(data.result.items, count);
+                    displayProducts(containerId, products, true);
                 } else {
-                    showError('new-releases', translations[currentLang].noContent);
+                    showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error('Error loading new releases:', error);
-                if (error.name === 'AbortError') {
-                    showError('new-releases', 'Timeout - Please refresh');
-                } else {
-                    showError('new-releases', 'Error loading content');
-                }
+                console.error('Error:', error);
+                showError(containerId, 'エラーが発生しました');
             }
         }
 
-        // ジャンル別ランキングを取得（中出しジャンル）
-        async function loadGenreRanking() {
+        // フロア別ランキングを取得
+        async function loadFloorRanking(floorCode, containerId, sort = 'rank', count = 10) {
             try {
-                // さらに多めに取得（30→50件）
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=50&output=json`;
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=${floorCode}&sort=${sort}&hits=50&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
                 
                 if (data.result && data.result.items) {
-                    console.log('Total genre items received:', data.result.items.length);
-                    
-                    const products = data.result.items
-                        .filter(item => {
-                            // 画像URLが存在するか確認
-                            if (!item.imageURL) return false;
-                            
-                            const imageUrl = item.imageURL.large || item.imageURL.small;
-                            if (!imageUrl) return false;
-                            
-                            // URLに問題がある画像を除外
-                            const urlLower = imageUrl.toLowerCase();
-                            if (urlLower.includes('nowprinting') || 
-                                urlLower.includes('now_printing') ||
-                                urlLower.includes('noimage') ||
-                                urlLower.includes('no-image') ||
-                                urlLower.includes('dummy') ||
-                                urlLower.includes('comingsoon')) {
-                                return false;
-                            }
-                            
-                            // DMM/FANZAの正規の画像サーバーかチェック
-                            if (!urlLower.includes('pics.dmm.co') && 
-                                !urlLower.includes('pics.dmm.com')) {
-                                return false;
-                            }
-                            
-                            return true;
-                        })
-                        .slice(0, 10);
-                    
-                    console.log('Filtered genre products:', products.length);
-                    displayProducts('genre-ranking', products, true);
+                    const products = filterValidProducts(data.result.items, count);
+                    displayProducts(containerId, products, true);
                 } else {
-                    showError('genre-ranking', translations[currentLang].noContent);
+                    showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error('Error loading genre ranking:', error);
-                if (error.name === 'AbortError') {
-                    showError('genre-ranking', 'Timeout - Please refresh');
+                console.error('Error:', error);
+                showError(containerId, 'エラーが発生しました');
+            }
+        }
+
+        // 女優別作品を取得
+        async function loadActressWorks(actressId, containerId, count = 6) {
+            try {
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=actress&article_id=${actressId}&sort=review&hits=30&output=json`;
+                
+                const data = await fetchWithProxy(apiUrl);
+                
+                if (data.result && data.result.items) {
+                    const products = filterValidProducts(data.result.items, count);
+                    displayProducts(containerId, products, false);
                 } else {
-                    showError('genre-ranking', 'Error loading content');
+                    showError(containerId, 'コンテンツが見つかりません');
                 }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(containerId, 'エラーが発生しました');
             }
         }
 
@@ -637,7 +654,7 @@
             const t = translations[currentLang];
             
             if (!products || products.length === 0) {
-                container.innerHTML = `<p class="loading">${t.noContent}</p>`;
+                container.innerHTML = `<p class="loading">コンテンツが見つかりません</p>`;
                 return;
             }
             
@@ -675,12 +692,13 @@
                 `<p class="loading">${message}</p>`;
         }
 
-        // 言語切り替え
+        // 初期化
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
             
             updateUILanguage(currentLang);
+            generateGenreList();
             
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -698,15 +716,20 @@
                     
                     updateUILanguage(lang);
                     localStorage.setItem('preferredLanguage', lang);
-                    
-                    // 商品表示を更新
-                    loadNewReleases();
-                    loadGenreRanking();
                 });
             });
             
-            loadNewReleases();
-            loadGenreRanking();
+            // 全データをロード
+            loadGenreRanking(5001, 'creampie-ranking', 10);      // 中出し
+            loadGenreRanking(2001, 'bigbreasts-ranking', 10);    // 巨乳
+            loadGenreRanking(1014, 'milf-ranking', 10);          // 熟女
+            loadFloorRanking('videoc', 'amateur-review', 'review', 10); // 素人・評価順
+            loadFloorRanking('anime', 'anime-new', 'date', 10);  // アニメ・新着順
+            loadActressWorks(1054998, 'actress-1054998', 6);     // 松本いちか
+            loadActressWorks(1135554, 'actress-1135554', 6);     // 美園和花
+            loadActressWorks(1073158, 'actress-1073158', 6);     // 沙月恵奈
+            loadActressWorks(1050071, 'actress-1050071', 6);     // 弥生みづき
+            loadActressWorks(1107799, 'actress-1107799', 6);     // 逢沢みゆ
         });
     </script>
 </body>
