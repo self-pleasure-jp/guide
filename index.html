@@ -563,7 +563,7 @@
             throw lastError || new Error('All proxies failed');
         }
 
-        // 画像フィルタリング関数
+        // 画像フィルタリング関数（デバッグ用に一時的に緩和）
         function filterValidProducts(items, count) {
             console.log(`Filter input: ${items.length} items`);
             
@@ -579,28 +579,13 @@
                     return false;
                 }
                 
-                const urlLower = imageUrl.toLowerCase();
+                console.log(`Item ${index}: ✓ Has image - ${imageUrl}`);
                 
-                // 除外パターンチェック
-                const excludePatterns = ['nowprinting', 'now_printing', 'noimage', 'no-image', 'dummy', 'comingsoon', '/noimage/', 'pl.jpg'];
-                for (const pattern of excludePatterns) {
-                    if (urlLower.includes(pattern)) {
-                        console.log(`Item ${index}: Excluded by pattern "${pattern}" - ${imageUrl}`);
-                        return false;
-                    }
-                }
-                
-                // DMM画像サーバーチェック
-                if (!urlLower.includes('pics.dmm.co') && !urlLower.includes('pics.dmm.com')) {
-                    console.log(`Item ${index}: Not from pics.dmm - ${imageUrl}`);
-                    return false;
-                }
-                
-                console.log(`Item ${index}: ✓ Valid - ${imageUrl}`);
+                // 一時的にフィルタリングを緩和（デバッグ用）
                 return true;
             });
             
-            console.log(`Filter output: ${filtered.length} valid items`);
+            console.log(`Filter output: ${filtered.length} valid items (取得した最初の${count}件を表示)`);
             return filtered.slice(0, count);
         }
 
@@ -624,43 +609,78 @@
         }
 
         // フロア別ランキングを取得
-        async function loadFloorRanking(floorCode, containerId, sort = 'rank', count = 10) {
+        async function loadFloorRanking(floorCode, containerId, sort = 'rank', count = 10, site = 'FANZA') {
             try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=${floorCode}&sort=${sort}&hits=50&output=json`;
+                console.log(`Loading floor: ${floorCode}, site: ${site}, sort: ${sort}`);
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=${site}&service=digital&floor=${floorCode}&sort=${sort}&hits=50&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
+                console.log(`Floor ${floorCode} response:`, data);
                 
-                if (data.result && data.result.items) {
+                if (data.result && data.result.items && data.result.items.length > 0) {
                     const products = filterValidProducts(data.result.items, count);
+                    console.log(`Floor ${floorCode}: ${products.length} valid products`);
                     displayProducts(containerId, products, true);
                 } else {
+                    console.log(`Floor ${floorCode}: No items found`);
                     showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error(`Error loading floor ${floorCode}:`, error);
                 showError(containerId, 'エラーが発生しました');
             }
         }
 
-        // 女優別作品を取得
-        async function loadActressWorks(actressId, containerId, count = 6) {
+        // 女優IDを検索
+        async function searchActressId(actressName) {
             try {
-                console.log(`Loading actress ${actressId} for ${containerId}`);
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=actress&article_id=${actressId}&sort=review&hits=30&output=json`;
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ActressSearch?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&keyword=${encodeURIComponent(actressName)}&hits=1&output=json`;
                 
                 const data = await fetchWithProxy(apiUrl);
-                console.log(`Actress ${actressId} response:`, data);
+                console.log(`Actress search for "${actressName}":`, data);
+                
+                if (data.result && data.result.actress && data.result.actress.length > 0) {
+                    return data.result.actress[0].id;
+                }
+                return null;
+            } catch (error) {
+                console.error(`Error searching actress ${actressName}:`, error);
+                return null;
+            }
+        }
+
+        // 女優別作品を取得（女優名から検索）
+        async function loadActressWorksByName(actressName, containerId, count = 6) {
+            try {
+                console.log(`Searching for actress: ${actressName}`);
+                
+                // まず女優IDを取得
+                const actressId = await searchActressId(actressName);
+                
+                if (!actressId) {
+                    console.log(`Actress "${actressName}" not found`);
+                    showError(containerId, `女優 "${actressName}" が見つかりません`);
+                    return;
+                }
+                
+                console.log(`Found actress ID: ${actressId} for ${actressName}`);
+                
+                // 作品を取得
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=actress&article_id=${actressId}&sort=review&hits=50&output=json`;
+                
+                const data = await fetchWithProxy(apiUrl);
+                console.log(`Works for ${actressName}:`, data);
                 
                 if (data.result && data.result.items && data.result.items.length > 0) {
                     const products = filterValidProducts(data.result.items, count);
-                    console.log(`Actress ${actressId} filtered: ${products.length} products`);
+                    console.log(`${actressName}: ${products.length} valid products`);
                     displayProducts(containerId, products, false);
                 } else {
-                    console.log(`Actress ${actressId}: No items in response`);
+                    console.log(`${actressName}: No items found`);
                     showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error(`Error loading actress ${actressId}:`, error);
+                console.error(`Error loading works for ${actressName}:`, error);
                 showError(containerId, 'エラーが発生しました');
             }
         }
@@ -739,13 +759,15 @@
             loadGenreRanking(5001, 'creampie-ranking', 10);      // 中出し
             loadGenreRanking(2001, 'bigbreasts-ranking', 10);    // 巨乳
             loadGenreRanking(1014, 'milf-ranking', 10);          // 熟女
-            loadFloorRanking('videoc', 'amateur-review', 'review', 10); // 素人・評価順
-            loadFloorRanking('anime', 'anime-new', 'date', 10);  // アニメ・新着順
-            loadActressWorks(1054998, 'actress-1054998', 6);     // 松本いちか
-            loadActressWorks(1135554, 'actress-1135554', 6);     // 美園和花
-            loadActressWorks(1073158, 'actress-1073158', 6);     // 沙月恵奈
-            loadActressWorks(1050071, 'actress-1050071', 6);     // 弥生みづき
-            loadActressWorks(1107799, 'actress-1107799', 6);     // 逢沢みゆ
+            loadFloorRanking('videoc', 'amateur-review', 'review', 10, 'FANZA'); // 素人・評価順
+            loadFloorRanking('anime', 'anime-new', 'date', 10, 'FANZA');  // アニメ・新着順
+            
+            // 女優別（名前で検索）
+            loadActressWorksByName('松本いちか', 'actress-1054998', 6);
+            loadActressWorksByName('美園和花', 'actress-1135554', 6);
+            loadActressWorksByName('沙月恵奈', 'actress-1073158', 6);
+            loadActressWorksByName('弥生みづき', 'actress-1050071', 6);
+            loadActressWorksByName('逢沢みゆ', 'actress-1107799', 6);
         });
     </script>
 </body>
