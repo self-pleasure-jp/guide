@@ -265,17 +265,16 @@
         let currentLang = 'ja';
         let currentGenre = '';
 
-        // Define translations FIRST
         const translations = {
             ja: {
                 warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
                 title: '新着・おすすめ情報',
                 subtitle: '厳選されたアダルトコンテンツ',
                 filterAll: 'すべて',
+                filterMilf: '熟女',
+                filterMarried: '人妻',
                 filterCreampie: '中出し',
                 filterBigBreasts: '巨乳',
-                filterBeauty: '美少女',
-                filterSlut: '痴女',
                 newBadge: 'NEW',
                 viewDetails: '詳細を見る',
                 loading: '読み込み中...',
@@ -287,10 +286,10 @@
                 title: 'Latest Releases',
                 subtitle: 'Curated adult content recommendations',
                 filterAll: 'All',
+                filterMilf: 'MILF',
+                filterMarried: 'Married Woman',
                 filterCreampie: 'Creampie',
                 filterBigBreasts: 'Big Breasts',
-                filterBeauty: 'Beauty',
-                filterSlut: 'Slut',
                 newBadge: 'NEW',
                 viewDetails: 'View Details',
                 loading: 'Loading content...',
@@ -302,10 +301,10 @@
                 title: 'Últimos Lanzamientos',
                 subtitle: 'Contenido para adultos seleccionado',
                 filterAll: 'Todo',
+                filterMilf: 'Mujer Madura',
+                filterMarried: 'Mujer Casada',
                 filterCreampie: 'Creampie',
                 filterBigBreasts: 'Pechos Grandes',
-                filterBeauty: 'Belleza',
-                filterSlut: 'Zorra',
                 newBadge: 'NUEVO',
                 viewDetails: 'Ver Detalles',
                 loading: 'Cargando contenido...',
@@ -322,45 +321,44 @@
             document.getElementById('title').textContent = t.title;
             document.getElementById('subtitle').textContent = t.subtitle;
             document.getElementById('filter-all').textContent = t.filterAll;
+            document.getElementById('filter-milf').textContent = t.filterMilf;
+            document.getElementById('filter-married').textContent = t.filterMarried;
             document.getElementById('filter-creampie').textContent = t.filterCreampie;
             document.getElementById('filter-bigbreasts').textContent = t.filterBigBreasts;
-            document.getElementById('filter-beauty').textContent = t.filterBeauty;
-            document.getElementById('filter-slut').textContent = t.filterSlut;
         }
 
         async function loadProducts() {
-    try {
-        let apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=24&output=json`;
-        
-        if (currentGenre) {
-            apiUrl += `&article=genre&article_id=${currentGenre}`;
+            try {
+                let apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=24&output=json`;
+                
+                if (currentGenre) {
+                    apiUrl += `&article=genre&article_id=${currentGenre}`;
+                }
+                
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                if (data.result && data.result.items && data.result.items.length > 0) {
+                    allProducts = data.result.items;
+                    displayProducts(allProducts);
+                } else {
+                    const t = translations[currentLang];
+                    document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                const t = translations[currentLang];
+                document.getElementById('products').innerHTML = `<p class="loading">${t.error}</p>`;
+            }
         }
-        
-        // 別のCORSプロキシを試す
-        const proxyUrl = 'https://corsproxy.io/?';
-        const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        console.log('API Response:', data);
-        
-        if (data.result && data.result.items && data.result.items.length > 0) {
-            allProducts = data.result.items;
-            displayProducts(allProducts);
-        } else {
-            const t = translations[currentLang];
-            document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
-        }
-    } catch (error) {
-        console.error('Error loading products:', error);
-        const t = translations[currentLang];
-        document.getElementById('products').innerHTML = `<p class="loading">${t.error}</p>`;
-    }
-}
 
         function displayProducts(products) {
             const container = document.getElementById('products');
