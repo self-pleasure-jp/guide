@@ -24,6 +24,38 @@
             font-size: 14px;
             color: #cccccc;
         }
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            background: #111111;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #333333;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid #333333;
+            color: #888888;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            border-color: #666666;
+            color: #ffffff;
+        }
+        .lang-btn.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -31,6 +63,7 @@
         }
         header {
             margin-bottom: 60px;
+            margin-top: 40px;
         }
         h1 {
             font-size: 48px;
@@ -52,6 +85,7 @@
             margin-bottom: 40px;
             border-bottom: 1px solid #222222;
             padding-bottom: 20px;
+            flex-wrap: wrap;
         }
         .filter-btn {
             background: transparent;
@@ -167,6 +201,13 @@
             h1 {
                 font-size: 32px;
             }
+            .language-selector {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 20px;
+                justify-content: center;
+            }
             .filters {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
@@ -179,25 +220,31 @@
     </style>
 </head>
 <body>
-    <div class="warning">
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="changeLanguage('ja')">日本語</button>
+        <button class="lang-btn" onclick="changeLanguage('en')">English</button>
+        <button class="lang-btn" onclick="changeLanguage('es')">Español</button>
+    </div>
+
+    <div class="warning" id="warning">
         18+ CONTENT WARNING — This site contains adult material and is intended for adults only.
     </div>
     
     <div class="container">
         <header>
-            <h1>Latest Releases</h1>
-            <p class="subtitle">Curated adult content recommendations</p>
+            <h1 id="title">Latest Releases</h1>
+            <p class="subtitle" id="subtitle">Curated adult content recommendations</p>
         </header>
         
         <div class="filters">
-            <button class="filter-btn active" onclick="filterProducts('all')">All</button>
-            <button class="filter-btn" onclick="filterProducts('new')">New Arrivals</button>
-            <button class="filter-btn" onclick="filterProducts('sale')">On Sale</button>
-            <button class="filter-btn" onclick="filterProducts('popular')">Popular</button>
+            <button class="filter-btn active" onclick="filterProducts('all')" id="filter-all">All</button>
+            <button class="filter-btn" onclick="filterProducts('new')" id="filter-new">New Arrivals</button>
+            <button class="filter-btn" onclick="filterProducts('sale')" id="filter-sale">On Sale</button>
+            <button class="filter-btn" onclick="filterProducts('popular')" id="filter-popular">Popular</button>
         </div>
         
         <div id="products">
-            <div class="loading">Loading content...</div>
+            <div class="loading" id="loading">Loading content...</div>
         </div>
     </div>
 
@@ -206,6 +253,77 @@
         const AFFILIATE_ID = 'yoru365-990';
         
         let allProducts = [];
+        let currentLang = 'ja';
+        
+        const translations = {
+            ja: {
+                warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
+                title: '新着・おすすめ情報',
+                subtitle: '厳選されたアダルトコンテンツ',
+                filterAll: 'すべて',
+                filterNew: '新着',
+                filterSale: 'セール中',
+                filterPopular: '人気',
+                newBadge: 'NEW',
+                viewDetails: '詳細を見る',
+                loading: '読み込み中...',
+                noContent: 'コンテンツが見つかりません',
+                error: 'エラーが発生しました'
+            },
+            en: {
+                warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
+                title: 'Latest Releases',
+                subtitle: 'Curated adult content recommendations',
+                filterAll: 'All',
+                filterNew: 'New Arrivals',
+                filterSale: 'On Sale',
+                filterPopular: 'Popular',
+                newBadge: 'NEW',
+                viewDetails: 'View Details',
+                loading: 'Loading content...',
+                noContent: 'No content found',
+                error: 'Error loading content'
+            },
+            es: {
+                warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
+                title: 'Últimos Lanzamientos',
+                subtitle: 'Contenido para adultos seleccionado',
+                filterAll: 'Todo',
+                filterNew: 'Nuevos',
+                filterSale: 'En Oferta',
+                filterPopular: 'Populares',
+                newBadge: 'NUEVO',
+                viewDetails: 'Ver Detalles',
+                loading: 'Cargando contenido...',
+                noContent: 'No se encontró contenido',
+                error: 'Error al cargar contenido'
+            }
+        };
+        
+        function changeLanguage(lang) {
+            currentLang = lang;
+            
+            // Update language buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update UI text
+            const t = translations[lang];
+            document.getElementById('warning').textContent = t.warning;
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('filter-all').textContent = t.filterAll;
+            document.getElementById('filter-new').textContent = t.filterNew;
+            document.getElementById('filter-sale').textContent = t.filterSale;
+            document.getElementById('filter-popular').textContent = t.filterPopular;
+            
+            // Redisplay products with new language
+            if (allProducts.length > 0) {
+                displayProducts(allProducts);
+            }
+        }
         
         async function loadProducts() {
             try {
@@ -218,19 +336,22 @@
                     allProducts = data.result.items;
                     displayProducts(allProducts);
                 } else {
-                    document.getElementById('products').innerHTML = '<p class="loading">Failed to load content</p>';
+                    const t = translations[currentLang];
+                    document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('products').innerHTML = '<p class="loading">Error loading content</p>';
+                const t = translations[currentLang];
+                document.getElementById('products').innerHTML = `<p class="loading">${t.error}</p>`;
             }
         }
         
         function displayProducts(products) {
             const container = document.getElementById('products');
+            const t = translations[currentLang];
             
             if (!products || products.length === 0) {
-                container.innerHTML = '<p class="loading">No content found</p>';
+                container.innerHTML = `<p class="loading">${t.noContent}</p>`;
                 return;
             }
             
@@ -245,14 +366,14 @@
                     <div class="product-info">
                         <div class="product-title">${item.title}</div>
                         <div class="product-meta">
-                            <span class="new-badge">NEW</span>
+                            <span class="new-badge">${t.newBadge}</span>
                             <span class="product-price">¥${item.prices ? item.prices.price.toLocaleString() : '---'}</span>
                         </div>
                         <a href="${item.affiliateURL}" 
                            class="product-link" 
                            target="_blank" 
                            rel="noopener noreferrer">
-                            View Details
+                            ${t.viewDetails}
                         </a>
                     </div>
                 </div>
@@ -267,6 +388,7 @@
             displayProducts(allProducts);
         }
         
+        // Initialize with Japanese
         loadProducts();
     </script>
 </body>
