@@ -2,11 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adult Content Guide - Top Rankings</title>
+    <title>人気無料エロ動画</title>
     <style>
         * {
             margin: 0;
@@ -19,115 +16,106 @@
             color: #ffffff;
             line-height: 1.6;
         }
-        .warning {
-            background: #1a1a1a;
-            border-left: 4px solid #ff3366;
-            padding: 16px 24px;
-            margin: 20px;
-            font-size: 14px;
-            color: #cccccc;
-        }
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 8px;
-            background: #111111;
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #333333;
-        }
-        .lang-btn {
-            background: transparent;
-            border: 1px solid #333333;
-            color: #888888;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .lang-btn:hover {
-            border-color: #666666;
-            color: #ffffff;
-        }
-        .lang-btn.active {
-            background: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-        }
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
         }
-        header {
-            margin-bottom: 60px;
-            margin-top: 40px;
+        .warning {
+            background: #1a1a1a;
+            border-left: 4px solid #ff3366;
+            padding: 12px 20px;
+            margin-bottom: 30px;
+            font-size: 13px;
+            color: #999999;
         }
         h1 {
-            font-size: 48px;
+            font-size: 28px;
             font-weight: 700;
-            letter-spacing: -1px;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ffffff;
         }
-        .subtitle {
-            font-size: 18px;
-            color: #666666;
-            font-weight: 300;
-        }
-        .ranking-badge {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #000000;
-            padding: 8px 16px;
+        
+        /* キーワードリンクセクション（無料動画） */
+        .keyword-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f2027 100%);
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            display: inline-block;
+            padding: 24px;
             margin-bottom: 40px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid #00ff00;
         }
-        #products {
+        .keyword-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #00ff00;
+        }
+        .keyword-title .free-icon {
+            display: inline-block;
+            background: #00ff00;
+            color: #000000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        .keyword-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .keyword-link {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid #00ff00;
+            transition: all 0.2s;
+        }
+        .keyword-link:hover {
+            background: #00ff00;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
+        }
+        
+        /* ★★★ キーワード設定エリア（編集しやすい） ★★★ */
+        .keyword-熟女 { order: 1; }
+        .keyword-人妻 { order: 2; }
+        .keyword-中出し { order: 3; }
+        .keyword-寝取り { order: 4; }
+        .keyword-巨乳 { order: 5; }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333333;
+            color: #ffffff;
+        }
+        .products {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
         .product {
             background: #111111;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             transition: all 0.3s;
             border: 1px solid #1a1a1a;
-            position: relative;
         }
         .product:hover {
             transform: translateY(-4px);
             border-color: #333333;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .rank-number {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffd700;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            z-index: 10;
-            border: 2px solid #ffd700;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
         }
         .product-image-wrapper {
             position: relative;
@@ -145,62 +133,58 @@
             object-fit: cover;
         }
         .product-info {
-            padding: 20px;
+            padding: 12px;
         }
         .product-title {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            line-height: 1.5;
-            height: 42px;
+            font-size: 12px;
+            line-height: 1.4;
+            height: 34px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            color: #ffffff;
-        }
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .product-price {
-            font-size: 20px;
-            color: #ffffff;
-            font-weight: 600;
-        }
-        .hot-badge {
-            background: #ff3366;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #cccccc;
+            margin-bottom: 8px;
         }
         .product-link {
             display: block;
             background: #ffffff;
             color: #000000;
             text-align: center;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 4px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             transition: all 0.2s;
         }
         .product-link:hover {
             background: #f0f0f0;
-            transform: scale(1.02);
+        }
+        .credit {
+            text-align: center;
+            margin: 50px 0 20px 0;
+            padding: 20px;
+            background: #111111;
+            border-radius: 8px;
+        }
+        .credit-text {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+        .credit-link {
+            display: inline-block;
+            margin: 10px;
+        }
+        .credit-link img {
+            height: 35px;
+            width: auto;
         }
         .loading {
             text-align: center;
             color: #666666;
-            font-size: 16px;
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
         .spinner {
             border: 3px solid #333333;
@@ -215,204 +199,177 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .error-detail {
-            font-size: 12px;
-            color: #999999;
-            margin-top: 8px;
-        }
         @media (max-width: 768px) {
+            .products {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
             h1 {
-                font-size: 32px;
+                font-size: 22px;
             }
-            .language-selector {
-                position: relative;
-                top: 0;
-                right: 0;
-                margin: 20px;
-                justify-content: center;
+            .keyword-links {
+                gap: 8px;
             }
-            #products {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            .keyword-link {
+                padding: 8px 16px;
+                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="language-selector">
-        <button class="lang-btn active" data-lang="ja">日本語</button>
-        <button class="lang-btn" data-lang="en">English</button>
-        <button class="lang-btn" data-lang="es">Español</button>
-    </div>
-
-    <div class="warning" id="warning">
-        18+ CONTENT WARNING — This site contains adult material and is intended for adults only.
-    </div>
-    
     <div class="container">
-        <header>
-            <h1 id="title">Top 5 Ranking</h1>
-            <p class="subtitle" id="subtitle">Most popular adult content right now</p>
-            <div class="ranking-badge" id="ranking-badge">検索ランキング TOP 5</div>
-        </header>
+        <div class="warning">⚠️ 18歳未満の方は閲覧できません</div>
         
-        <div id="products">
+        <h1 id="main-title">人気無料エロ動画</h1>
+        
+        <!-- ★★★ 無料動画キーワードリンクセクション ★★★ -->
+        <div class="keyword-section">
+            <div class="keyword-title">
+                無料動画を探す
+                <span class="free-icon">完全無料</span>
+            </div>
+            <div class="keyword-links" id="keyword-links">
+                <!-- キーワードリンクがここに動的に生成されます -->
+            </div>
+        </div>
+        
+        <h2 class="section-title">新着動画 TOP 6</h2>
+        
+        <div id="ranking-products" class="products">
             <div class="loading">
                 <div class="spinner"></div>
-                <div id="loading">Loading top rankings...</div>
+                <div>読み込み中...</div>
             </div>
+        </div>
+
+        <div class="credit">
+            <p class="credit-text">Powered by <a href="https://affiliate.dmm.com/api/" target="_blank" rel="noopener noreferrer" style="color: #ff3366; text-decoration: none;">FANZA Webサービス</a></p>
+            <a href="https://www.dmm.co.jp/" class="credit-link" target="_blank" rel="noopener noreferrer">
+                <img src="https://pics.dmm.co.jp/af/88x31_dmm.gif" alt="DMM.com" width="88" height="31">
+            </a>
+            <a href="https://www.dmm.co.jp/digital/-/videoa/" class="credit-link" target="_blank" rel="noopener noreferrer">
+                <img src="https://pics.dmm.co.jp/af/88x31_fanza_w.gif" alt="FANZA" width="88" height="31">
+            </a>
         </div>
     </div>
 
     <script>
-        // Age verification check
-        if (localStorage.getItem('ageVerified') !== 'true') {
-            localStorage.setItem('ageVerified', 'true');
-        }
-
         const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
         const AFFILIATE_ID = 'yoru365-990';
 
-        let currentLang = 'ja';
-
-        const translations = {
-            ja: {
-                warning: '⚠️ 18歳未満の方は閲覧できません ⚠️',
-                title: '検索ランキング TOP 5',
-                subtitle: '今最も人気のアダルトコンテンツ',
-                rankingBadge: '🏆 検索ランキング TOP 5',
-                hotBadge: 'HOT',
-                viewDetails: '詳細を見る',
-                loading: 'ランキング読み込み中...',
-                noContent: 'ランキングが取得できませんでした',
-                error: 'エラーが発生しました'
+        // ★★★ 無料動画キーワード設定（ここで簡単に追加・削除できます） ★★★
+        // LITEVIDEO の URL を使用
+        const KEYWORDS = [
+            { 
+                text: '熟女', 
+                genreId: '1014',
+                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=1014/sort=date/' 
             },
-            en: {
-                warning: '18+ CONTENT WARNING — This site contains adult material and is intended for adults only.',
-                title: 'Top 5 Ranking',
-                subtitle: 'Most popular adult content right now',
-                rankingBadge: '🏆 Search Ranking TOP 5',
-                hotBadge: 'HOT',
-                viewDetails: 'View Details',
-                loading: 'Loading top rankings...',
-                noContent: 'Could not load rankings',
-                error: 'Error loading content'
+            { 
+                text: '人妻', 
+                genreId: '1039',
+                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=1039/sort=date/' 
             },
-            es: {
-                warning: 'ADVERTENCIA +18 — Este sitio contiene material para adultos y está destinado solo para adultos.',
-                title: 'Top 5 Ranking',
-                subtitle: 'Contenido para adultos más popular ahora',
-                rankingBadge: '🏆 Ranking de Búsqueda TOP 5',
-                hotBadge: 'CALIENTE',
-                viewDetails: 'Ver Detalles',
-                loading: 'Cargando rankings...',
-                noContent: 'No se pudo cargar el ranking',
-                error: 'Error al cargar contenido'
+            { 
+                text: '中出し', 
+                genreId: '5001',
+                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=5001/sort=date/' 
+            },
+            { 
+                text: '寝取り', 
+                genreId: '4111',
+                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=4111/sort=date/' 
+            },
+            { 
+                text: '巨乳', 
+                genreId: '2001',
+                liteVideoUrl: 'https://www.dmm.co.jp/litevideo/-/list/=/article=keyword/id=2001/sort=date/' 
             }
-        };
-
-        function updateUILanguage(lang) {
-            const t = translations[lang];
-            if (!t) return;
-            
-            document.getElementById('warning').textContent = t.warning;
-            document.getElementById('title').textContent = t.title;
-            document.getElementById('subtitle').textContent = t.subtitle;
-            document.getElementById('ranking-badge').textContent = t.rankingBadge;
+        ];
+        
+        // 新しいキーワードを追加する場合:
+        // 1. https://www.dmm.co.jp/litevideo/ でジャンルIDを確認
+        // 2. 上の配列に追加
+        
+        // 日付表示（例：2025年11月10日の人気無料エロ動画）
+        function updateDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const day = today.getDate();
+            document.getElementById('main-title').textContent = `${year}年${month}月${day}日の人気無料エロ動画`;
         }
 
-        async function loadTopRanking() {
+        // キーワードリンクを生成（LITEVIDEO へのアフィリエイトリンク）
+        function generateKeywordLinks() {
+            const container = document.getElementById('keyword-links');
+            container.innerHTML = KEYWORDS.map(keyword => {
+                // アフィリエイトリンクに変換
+                const affiliateUrl = `https://al.fanza.co.jp/link.php?aff_id=${AFFILIATE_ID}&cid=af_linkbanner_txt&sid=004&pcode=&link=${encodeURIComponent(keyword.liteVideoUrl)}`;
+                
+                return `
+                    <a href="${affiliateUrl}" 
+                       class="keyword-link keyword-${keyword.text}" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        ${keyword.text}
+                    </a>
+                `;
+            }).join('');
+        }
+
+        async function loadNewReleases() {
             try {
-                // ランキング順で上位20件を取得（画像なしを除外するため多めに取得）
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&hits=20&output=json`;
+                // 新着順（date）で取得
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=12&output=json`;
                 
-                console.log('API URL:', apiUrl);
-                
-                // タイムアウト付きfetch（10秒）
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
                 
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
                     method: 'GET',
-                    signal: controller.signal,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error('API error');
                 
                 const data = await response.json();
-                console.log('API Response:', data);
                 
-                if (data.result && data.result.items && data.result.items.length > 0) {
-                    // 画像があるものだけをフィルターして上位5件を取得
-                    const productsWithImages = data.result.items.filter(item => {
-                        return item.imageURL && 
-                               (item.imageURL.large || item.imageURL.small);
-                    });
+                if (data.result && data.result.items) {
+                    // 画像があるものだけ取得して6件表示
+                    const products = data.result.items
+                        .filter(item => item.imageURL && (item.imageURL.large || item.imageURL.small))
+                        .slice(0, 6);
                     
-                    const top5Products = productsWithImages.slice(0, 5);
-                    
-                    console.log(`Top 5 products: ${top5Products.length}`);
-                    
-                    if (top5Products.length > 0) {
-                        displayProducts(top5Products);
-                    } else {
-                        const t = translations[currentLang];
-                        document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
-                    }
+                    displayProducts(products);
                 } else {
-                    const t = translations[currentLang];
-                    document.getElementById('products').innerHTML = `<p class="loading">${t.noContent}</p>`;
+                    showError('データが取得できませんでした');
                 }
             } catch (error) {
-                console.error('Error loading products:', error);
-                const t = translations[currentLang];
-                
-                let errorMsg = t.error;
-                if (error.name === 'AbortError') {
-                    errorMsg = 'タイムアウト: 読み込みに時間がかかりすぎています';
-                }
-                
-                document.getElementById('products').innerHTML = `
-                    <p class="loading">
-                        ${errorMsg}
-                        <br>
-                        <span class="error-detail">${error.message}</span>
-                    </p>
-                `;
+                console.error('Error:', error);
+                showError('エラーが発生しました');
             }
         }
 
         function displayProducts(products) {
-            const container = document.getElementById('products');
-            const t = translations[currentLang];
+            const container = document.getElementById('ranking-products');
             
             if (!products || products.length === 0) {
-                container.innerHTML = `<p class="loading">${t.noContent}</p>`;
+                container.innerHTML = '<p class="loading">商品が見つかりませんでした</p>';
                 return;
             }
             
-            container.innerHTML = products.map((item, index) => {
-                let price = '---';
-                if (item.prices && item.prices.price) {
-                    price = item.prices.price;
-                }
-                
-                // 画像URLは必ず存在する（フィルター済み）
+            container.innerHTML = products.map(item => {
                 const imageUrl = item.imageURL.large || item.imageURL.small;
                 const affiliateUrl = item.affiliateURL || item.URL || '#';
                 const title = (item.title || 'タイトル不明').replace(/"/g, '&quot;');
-                const rankNumber = index + 1;
                 
                 return `
                     <div class="product">
-                        <div class="rank-number">${rankNumber}</div>
                         <div class="product-image-wrapper">
                             <img src="${imageUrl}" 
                                  alt="${title}" 
@@ -421,15 +378,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-title">${item.title || 'タイトル不明'}</div>
-                            <div class="product-meta">
-                                <span class="hot-badge">${t.hotBadge}</span>
-                                <span class="product-price">${price}</span>
-                            </div>
                             <a href="${affiliateUrl}" 
                                class="product-link" 
                                target="_blank" 
                                rel="noopener noreferrer">
-                                ${t.viewDetails}
+                                詳細を見る
                             </a>
                         </div>
                     </div>
@@ -437,43 +390,16 @@
             }).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
-            
-            updateUILanguage(currentLang);
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-lang') === currentLang) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    currentLang = lang;
-                    
-                    document.querySelectorAll('.lang-btn').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    updateUILanguage(lang);
-                    localStorage.setItem('preferredLanguage', lang);
-                    
-                    // 言語変更時に商品を再表示
-                    const products = Array.from(document.querySelectorAll('.product'));
-                    if (products.length > 0) {
-                        // 既存の商品データを取得して再表示
-                        loadTopRanking();
-                    }
-                });
-            });
-            
-            // 初回ロード
-            loadTopRanking();
+        function showError(message) {
+            document.getElementById('ranking-products').innerHTML = 
+                `<p class="loading">${message}</p>`;
+        }
+
+        // ページ読み込み時に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
+            generateKeywordLinks();
+            loadNewReleases();
         });
     </script>
 </body>
