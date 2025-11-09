@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .verify-container {
+            max-width: 500px;
+            width: 100%;
+            background: #111111;
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            border: 1px solid #222222;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .warning-text {
+            color: #ff3366;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .description {
+            color: #888888;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .buttons {
+            display: flex;
+            gap: 16px;
+            flex-direction: column;
+        }
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+            display: block;
+        }
+        .btn-enter {
+            background: #ffffff;
+            color: #000000;
+        }
+        .btn-enter:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+        .btn-exit {
+            background: transparent;
+            color: #666666;
+            border: 1px solid #333333;
+        }
+        .btn-exit:hover {
+            border-color: #666666;
+            color: #888888;
+        }
+        .language-selector {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid #333333;
+            color: #888888;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover {
+            border-color: #666666;
+            color: #ffffff;
+        }
+        .lang-btn.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+        @media (max-width: 768px) {
+            .verify-container {
+                padding: 40px 30px;
+            }
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="icon">🔞</div>
+        
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="changeLanguage('ja')">日本語</button>
+            <button class="lang-btn" onclick="changeLanguage('en')">English</button>
+            <button class="lang-btn" onclick="changeLanguage('es')">Español</button>
+        </div>
+        
+        <h1 id="title">年齢確認</h1>
+        <p class="warning-text" id="warning">このサイトには成人向けコンテンツが含まれています</p>
+        <p class="description" id="description">
+            このサイトにアクセスするには18歳以上である必要があります。<br>
+            あなたは18歳以上ですか？
+        </p>
+        
+        <div class="buttons">
+            <button class="btn btn-enter" onclick="enterSite()" id="btn-enter">
+                はい、18歳以上です
+            </button>
+            <a href="https://www.google.com" class="btn btn-exit" id="btn-exit">
+                いいえ、18歳未満です
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            ja: {
+                title: '年齢確認',
+                warning: 'このサイトには成人向けコンテンツが含まれています',
+                description: 'このサイトにアクセスするには18歳以上である必要があります。<br>あなたは18歳以上ですか？',
+                btnEnter: 'はい、18歳以上です',
+                btnExit: 'いいえ、18歳未満です'
+            },
+            en: {
+                title: 'Age Verification',
+                warning: 'This site contains adult content',
+                description: 'You must be 18 years or older to access this site.<br>Are you 18 years or older?',
+                btnEnter: 'Yes, I am 18 or older',
+                btnExit: 'No, I am under 18'
+            },
+            es: {
+                title: 'Verificación de Edad',
+                warning: 'Este sitio contiene contenido para adultos',
+                description: 'Debes tener 18 años o más para acceder a este sitio.<br>¿Tienes 18 años o más?',
+                btnEnter: 'Sí, tengo 18 años o más',
+                btnExit: 'No, soy menor de 18'
+            }
+        };
+        
+        function changeLanguage(lang) {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const t = translations[lang];
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('warning').textContent = t.warning;
+            document.getElementById('description').innerHTML = t.description;
+            document.getElementById('btn-enter').textContent = t.btnEnter;
+            document.getElementById('btn-exit').textContent = t.btnExit;
+            
+            // Save language preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+        
+        function enterSite() {
+            // Save verification status
+            localStorage.setItem('ageVerified', 'true');
+            
+            // Get preferred language
+            const lang = localStorage.getItem('preferredLanguage') || 'ja';
+            
+            // Redirect to main page with language parameter
+            window.location.href = `index.html?lang=${lang}`;
+        }
+        
+        // Check if already verified
+        if (localStorage.getItem('ageVerified') === 'true') {
+            const lang = localStorage.getItem('preferredLanguage') || 'ja';
+            window.location.href = `index.html?lang=${lang}`;
+        }
+    </script>
+</body>
+</html>
