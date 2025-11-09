@@ -249,11 +249,20 @@
     </div>
 
     <script>
+        // Age verification check
+        if (localStorage.getItem('ageVerified') !== 'true') {
+            window.location.href = 'age-verify.html';
+        }
+        
         const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
         const AFFILIATE_ID = 'yoru365-990';
         
         let allProducts = [];
-        let currentLang = 'ja';
+        
+        // Get language from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
+        let currentLang = initialLang;
         
         const translations = {
             ja: {
@@ -307,7 +316,9 @@
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             // Update UI text
             const t = translations[lang];
@@ -318,6 +329,17 @@
             document.getElementById('filter-new').textContent = t.filterNew;
             document.getElementById('filter-sale').textContent = t.filterSale;
             document.getElementById('filter-popular').textContent = t.filterPopular;
+            
+            // Update active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Save preference
+            localStorage.setItem('preferredLanguage', lang);
             
             // Redisplay products with new language
             if (allProducts.length > 0) {
@@ -388,8 +410,11 @@
             displayProducts(allProducts);
         }
         
-        // Initialize with Japanese
-        loadProducts();
+        // Set initial language on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            changeLanguage(currentLang);
+            loadProducts();
+        });
     </script>
 </body>
 </html>
