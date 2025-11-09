@@ -467,7 +467,7 @@
                 const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=12&output=json`;
                 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒に延長
                 
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
@@ -491,8 +491,12 @@
                     showError('new-releases', translations[currentLang].noContent);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showError('new-releases', 'Error');
+                console.error('Error loading new releases:', error);
+                if (error.name === 'AbortError') {
+                    showError('new-releases', 'Timeout - Please refresh');
+                } else {
+                    showError('new-releases', 'Error loading content');
+                }
             }
         }
 
@@ -502,7 +506,7 @@
                 const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=5001&hits=20&output=json`;
                 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒に延長
                 
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
                 const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
@@ -526,8 +530,12 @@
                     showError('genre-ranking', translations[currentLang].noContent);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showError('genre-ranking', 'Error');
+                console.error('Error loading genre ranking:', error);
+                if (error.name === 'AbortError') {
+                    showError('genre-ranking', 'Timeout - Please refresh');
+                } else {
+                    showError('genre-ranking', 'Error loading content');
+                }
             }
         }
 
