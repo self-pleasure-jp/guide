@@ -592,18 +592,25 @@
         // ジャンル別ランキングを取得
         async function loadGenreRanking(genreId, containerId, count = 10) {
             try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&article=genre&article_id=${genreId}&hits=50&output=json`;
+                console.log(`Loading genre ${genreId} for ${containerId}`);
+                // floor=videoaを明示的に指定
+                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=genre&article_id=${genreId}&sort=rank&hits=50&output=json`;
                 
+                console.log(`API URL: ${apiUrl}`);
                 const data = await fetchWithProxy(apiUrl);
+                console.log(`Genre ${genreId} response:`, data);
                 
-                if (data.result && data.result.items) {
+                if (data.result && data.result.items && data.result.items.length > 0) {
+                    console.log(`Genre ${genreId}: ${data.result.items.length} items received`);
                     const products = filterValidProducts(data.result.items, count);
+                    console.log(`Genre ${genreId}: ${products.length} products after filtering`);
                     displayProducts(containerId, products, true);
                 } else {
+                    console.log(`Genre ${genreId}: No items in response`);
                     showError(containerId, 'コンテンツが見つかりません');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error(`Error loading genre ${genreId}:`, error);
                 showError(containerId, 'エラーが発生しました');
             }
         }
@@ -689,10 +696,19 @@
             const container = document.getElementById(containerId);
             const t = translations[currentLang];
             
+            console.log(`displayProducts called for ${containerId} with ${products.length} products`);
+            
+            if (!container) {
+                console.error(`Container ${containerId} not found!`);
+                return;
+            }
+            
             if (!products || products.length === 0) {
                 container.innerHTML = `<p class="loading">コンテンツが見つかりません</p>`;
                 return;
             }
+            
+            console.log(`Rendering ${products.length} products to ${containerId}`);
             
             container.innerHTML = products.map((item, index) => {
                 const imageUrl = item.imageURL.large || item.imageURL.small;
@@ -721,6 +737,8 @@
                     </div>
                 `;
             }).join('');
+            
+            console.log(`✓ Successfully rendered to ${containerId}`);
         }
 
         function showError(containerId, message) {
