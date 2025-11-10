@@ -853,8 +853,16 @@
 
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
+            // URLパラメータ、localStorage、デフォルトの順で言語を決定
             const urlParams = new URLSearchParams(window.location.search);
-            currentLang = urlParams.get('lang') || localStorage.getItem('preferredLanguage') || 'ja';
+            const urlLang = urlParams.get('lang');
+            const storedLang = localStorage.getItem('preferredLanguage');
+            currentLang = urlLang || storedLang || 'ja';
+            
+            // URLパラメータがあればlocalStorageも更新
+            if (urlLang) {
+                localStorage.setItem('preferredLanguage', urlLang);
+            }
             
             updateUILanguage(currentLang);
             generateGenreList();
