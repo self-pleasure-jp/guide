@@ -588,6 +588,11 @@
                 `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
             
             generateKeywordLinks();
+            
+            // 既存の商品ボタンのテキストを更新
+            document.querySelectorAll('.product-link').forEach(link => {
+                link.textContent = t.viewDetails;
+            });
         }
 
         function generateKeywordLinks() {
