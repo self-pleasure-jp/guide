@@ -402,19 +402,13 @@
         </div>
 
         <!-- 50音ジャンル一覧 -->
-        <h2 class="section-title">📋 全ジャンル一覧（50音順）</h2>
+        <h2 class="section-title" id="genre-list-title">📋 全ジャンル一覧（50音順）</h2>
         <div class="genre-list">
             <div class="genre-grid" id="genre-list"></div>
         </div>
 
         <div class="credit">
             <p class="credit-text">Powered by <a href="https://affiliate.dmm.com/api/" target="_blank" rel="noopener noreferrer" style="color: #ff3366; text-decoration: none;">FANZA Webサービス</a></p>
-            <a href="https://www.dmm.co.jp/" class="credit-link" target="_blank" rel="noopener noreferrer">
-                <img src="https://pics.dmm.co.jp/af/88x31_dmm.gif" alt="DMM.com" width="88" height="31">
-            </a>
-            <a href="https://www.dmm.co.jp/digital/-/videoa/" class="credit-link" target="_blank" rel="noopener noreferrer">
-                <img src="https://pics.dmm.co.jp/af/88x31_fanza_w.gif" alt="FANZA" width="88" height="31">
-            </a>
         </div>
     </div>
 
@@ -542,7 +536,8 @@
                 fanzaTvBtn: '📺 FANZA TV で見放題を楽しむ',
                 keywordSectionTitle: '新着の無料動画を探す',
                 freeIcon: 'FREE',
-                viewDetails: 'サンプル動画を見る'
+                viewDetails: 'サンプル動画を見る',
+                genreListTitle: '📋 全ジャンル一覧（50音順）'
             },
             en: {
                 warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
@@ -550,7 +545,8 @@
                 fanzaTvBtn: '📺 Watch Unlimited on FANZA TV',
                 keywordSectionTitle: 'Find New Free Videos',
                 freeIcon: 'FREE',
-                viewDetails: 'Watch Sample'
+                viewDetails: 'Watch Sample',
+                genreListTitle: '📋 All Genres (A-Z)'
             },
             es: {
                 warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
@@ -558,7 +554,8 @@
                 fanzaTvBtn: '📺 Ver Ilimitado en FANZA TV',
                 keywordSectionTitle: 'Buscar Nuevos Videos Gratis',
                 freeIcon: 'GRATIS',
-                viewDetails: 'Ver Muestra'
+                viewDetails: 'Ver Muestra',
+                genreListTitle: '📋 Todos los Géneros'
             }
         };
 
@@ -586,6 +583,7 @@
             document.getElementById('fanza-tv-btn').textContent = t.fanzaTvBtn;
             document.getElementById('keyword-section-title').innerHTML = 
                 `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
+            document.getElementById('genre-list-title').textContent = t.genreListTitle;
             
             generateKeywordLinks();
             
