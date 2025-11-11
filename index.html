@@ -16,6 +16,103 @@
             color: #ffffff;
             line-height: 1.6;
         }
+        
+        /* 年齢確認オーバーレイ */
+        #age-verification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #age-verification-overlay.hidden {
+            display: none;
+        }
+        .verification-container {
+            background: #111111;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #333333;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+        .warning-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .verification-container h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+        .subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #cccccc;
+        }
+        .description {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #999999;
+            margin-bottom: 32px;
+        }
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .verify-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-enter {
+            background: #ffffff;
+            color: #000000;
+        }
+        .btn-enter:hover {
+            background: #e6e6e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+        .btn-exit {
+            background: transparent;
+            color: #666666;
+            border: 2px solid #333333;
+        }
+        .btn-exit:hover {
+            border-color: #666666;
+            color: #999999;
+        }
+        .legal-notice {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #666666;
+            padding-top: 24px;
+            border-top: 1px solid #222222;
+        }
+        
+        #main-content {
+            display: none;
+        }
+        #main-content.visible {
+            display: block;
+        }
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -346,6 +443,37 @@
     </style>
 </head>
 <body>
+    <!-- 年齢確認オーバーレイ -->
+    <div id="age-verification-overlay">
+        <div class="verification-container">
+            <div class="warning-icon">⚠️</div>
+            <h2>年齢確認</h2>
+            <p class="subtitle">Age Verification Required</p>
+            <p class="description">
+                このサイトにはアダルトコンテンツが含まれています。<br>
+                18歳以上の方のみ入場できます。<br><br>
+                This site contains adult content.<br>
+                You must be 18 years or older to enter.
+            </p>
+            <div class="button-group">
+                <button id="btn-enter" class="verify-btn btn-enter">
+                    18歳以上<br>
+                    <small>I am 18 or older</small>
+                </button>
+                <button id="btn-exit" class="verify-btn btn-exit" onclick="window.location.href='https://www.google.com'">
+                    18歳未満<br>
+                    <small>I am under 18</small>
+                </button>
+            </div>
+            <div class="legal-notice">
+                ※ 本サイトはFANZAアフィリエイトプログラムを利用しています。<br>
+                ※ 18歳未満の方の閲覧は固くお断りします。
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="main-content">
     <div class="language-selector">
         <button class="lang-btn active" data-lang="ja">日本語</button>
         <button class="lang-btn" data-lang="en">English</button>
@@ -381,8 +509,8 @@
         <!-- アコーディオン式全ジャンル一覧 -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion()">
-                <div class="accordion-title" id="accordion-title">📋 あなたのフェチに合うジャンルはある？　全ジャンル一覧（50音順）</div>
-                <div class="accordion-icon open" id="accordion-icon">閉じる→　▼</div>
+                <div class="accordion-title" id="accordion-title">📋 あなたのフェチに合うジャンルはある？　全ジャンル一覧（50音順）　　　閉じる→　</div>
+                <div class="accordion-icon open" id="accordion-icon">▼</div>
             </div>
             <div class="accordion-content open" id="accordion-content">
                 <div class="accordion-inner">
@@ -458,13 +586,27 @@
     </div>
 
     <script>
-        // 年齢確認チェック
-        (function() {
-            if (localStorage.getItem('ageVerified') !== 'true') {
-                window.location.href = 'age-verify.html';
-                return;
+        // 年齢確認機能
+        function checkAgeVerification() {
+            const isVerified = localStorage.getItem('ageVerified') === 'true';
+            if (isVerified) {
+                document.getElementById('age-verification-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
             }
-        })();
+        }
+
+        // ページ読み込み時に年齢確認をチェック
+        checkAgeVerification();
+
+        // 18歳以上ボタンのイベント
+        const btnEnter = document.getElementById('btn-enter');
+        if (btnEnter) {
+            btnEnter.addEventListener('click', function() {
+                localStorage.setItem('ageVerified', 'true');
+                document.getElementById('age-verification-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+            });
+        }
         
         const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
         const AFFILIATE_ID = 'yoru365-990';
@@ -1086,5 +1228,6 @@
             loadActressWorksByName('逢沢みゆ', 'actress-1107799', 6);
         });
     </script>
+    </div><!-- #main-content -->
 </body>
 </html>
