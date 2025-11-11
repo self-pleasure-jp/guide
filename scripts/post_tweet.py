@@ -101,47 +101,28 @@ def get_current_post_index():
         return random.randint(0, 4)
 
 def fetch_latest_videos():
-    """FANZA APIから新着動画を取得（複数プロキシを試行）"""
-    # 複数のCORSプロキシ
-    proxies = [
-        'https://corsproxy.io/?',
-        'https://api.codetabs.com/v1/proxy?quest=',
-        'https://api.allorigins.win/raw?url='
-    ]
-    
-    api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&output=json'
-    
-    for i, proxy_url in enumerate(proxies, 1):
-        try:
-            print(f"🔄 Trying proxy {i}/{len(proxies)}: {proxy_url[:30]}...")
-            
-            if 'allorigins' in proxy_url:
-                url = proxy_url + api_url
-            else:
-                url = proxy_url + api_url
-            
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            if data.get('result') and data['result'].get('items'):
-                items = data['result']['items']
-                print(f"✅ Success! Fetched {len(items)} videos from FANZA API")
-                return items
-            else:
-                print(f"⚠️ Proxy {i}: No items in response")
-                continue
+    """FANZA APIから新着動画を取得（直接呼び出し）"""
+    try:
+        # GitHub Actionsからは直接APIを呼べる（CORSなし）
+        api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&output=json'
+        
+        print(f"🔄 Fetching from FANZA API...")
+        response = requests.get(api_url, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data.get('result') and data['result'].get('items'):
+            items = data['result']['items']
+            print(f"✅ Success! Fetched {len(items)} videos from FANZA API")
+            return items
+        else:
+            print("⚠️ No items in response")
+            return None
                 
-        except requests.exceptions.Timeout:
-            print(f"⏱️ Proxy {i}: Timeout")
-            continue
-        except Exception as e:
-            print(f"❌ Proxy {i}: {str(e)[:50]}")
-            continue
-    
-    print("❌ All proxies failed")
-    return None
+    except Exception as e:
+        print(f"❌ Error fetching videos: {e}")
+        return None
 
 def generate_tweet(video, post_index):
     """ツイートを生成"""
@@ -163,7 +144,11 @@ def generate_tweet(video, post_index):
     actresses = ['松本いちか', '美園和花', '沙月恵奈', '弥生みづき', '逢沢みゆ']
     random_actress = random.choice(actresses)
     
-    # ツイート生成
+    # 現在時刻（重複防止）
+    now = datetime.now()
+    time_str = now.strftime('%H:%M')
+    
+    # ツイート生成（ハッシュタグなし）
     tweet = f"""🆕 新着作品 #{post_index + 1}
 「{censored_title}」
 
@@ -173,10 +158,8 @@ def generate_tweet(video, post_index):
 👑 注目の女優さん
 {random_actress}
 
-🎬 詳しくはこちら
-{SITE_URL}
-
-#大人の動画 #無料視聴 #FANZA"""
+🎬 詳しくはこちら ({time_str})
+{SITE_URL}"""
     
     return tweet
 
@@ -188,16 +171,16 @@ def post_tweet():
         
         if not videos or len(videos) == 0:
             print("⚠️ No videos available, using fallback tweet")
-            # フォールバック用のツイート
+            # フォールバック用のツイート（ハッシュタグなし + 時刻追加）
+            now = datetime.now()
+            time_str = now.strftime('%H:%M')
             tweet_text = f"""🔥 本日の人気動画をチェック
 
 熟女・人妻・中〇し・巨〇など
 人気ジャンルのランキングを毎日更新中
 
-今すぐ無料で視聴👇
-{SITE_URL}
-
-#大人の動画 #無料視聴 #FANZA"""
+今すぐ無料で視聴 ({time_str})
+{SITE_URL}"""
         else:
             # 投稿インデックスを判定
             post_index = get_current_post_index()
