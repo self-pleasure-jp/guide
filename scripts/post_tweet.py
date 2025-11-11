@@ -101,28 +101,47 @@ def get_current_post_index():
         return random.randint(0, 4)
 
 def fetch_latest_videos():
-    """FANZA APIから新着動画を取得"""
-    try:
-        # CORSプロキシ経由でAPIを呼び出し
-        proxy_url = 'https://api.allorigins.win/raw?url='
-        api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&output=json'
-        
-        response = requests.get(proxy_url + api_url, timeout=15)
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        if data.get('result') and data['result'].get('items'):
-            items = data['result']['items']
-            print(f"✅ Fetched {len(items)} videos from FANZA API")
-            return items
-        else:
-            print("⚠️ No items found in API response")
-            return None
+    """FANZA APIから新着動画を取得（複数プロキシを試行）"""
+    # 複数のCORSプロキシ
+    proxies = [
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy?quest=',
+        'https://api.allorigins.win/raw?url='
+    ]
+    
+    api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&output=json'
+    
+    for i, proxy_url in enumerate(proxies, 1):
+        try:
+            print(f"🔄 Trying proxy {i}/{len(proxies)}: {proxy_url[:30]}...")
             
-    except Exception as e:
-        print(f"❌ Error fetching videos: {e}")
-        return None
+            if 'allorigins' in proxy_url:
+                url = proxy_url + api_url
+            else:
+                url = proxy_url + api_url
+            
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            if data.get('result') and data['result'].get('items'):
+                items = data['result']['items']
+                print(f"✅ Success! Fetched {len(items)} videos from FANZA API")
+                return items
+            else:
+                print(f"⚠️ Proxy {i}: No items in response")
+                continue
+                
+        except requests.exceptions.Timeout:
+            print(f"⏱️ Proxy {i}: Timeout")
+            continue
+        except Exception as e:
+            print(f"❌ Proxy {i}: {str(e)[:50]}")
+            continue
+    
+    print("❌ All proxies failed")
+    return None
 
 def generate_tweet(video, post_index):
     """ツイートを生成"""
