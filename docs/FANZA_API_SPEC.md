@@ -4,7 +4,7 @@
 
 ```
 API ID: a2BXCsL2MVUtUeuFBZ1h
-アフィリエイトID: yoru365-990
+アフィリエイトID: yoru365-002
 サイト: FANZA
 サービス: digital (動画)
 フロア: videoa (ビデオ)
@@ -26,7 +26,7 @@ https://api.dmm.com/affiliate/v3/ItemList
 | 論理名 | 物理名 | 必須 | 値のサンプル | 概要 |
 |--------|--------|------|--------------|------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h | 登録時に割り振られたID |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 | アフィリエイトID |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 | アフィリエイトID |
 | サイト | site | ○ | FANZA | アダルト（FANZA）|
 | サービス | service | | digital | サービスコード |
 | フロア | floor | | videoa | フロアコード |
@@ -88,7 +88,7 @@ https://api.dmm.com/affiliate/v3/FloorList
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002002 |
 | 出力形式 | output | | json |
 
 ### FANZA 動画フロア
@@ -115,7 +115,7 @@ https://api.dmm.com/affiliate/v3/GenreSearch
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 |
 | フロアID | floor_id | ○ | 43 |
 | 頭文字(50音) | initial | | あ |
 | 取得件数 | hits | | 100 (最大500) |
@@ -148,7 +148,7 @@ https://api.dmm.com/affiliate/v3/ActressSearch
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 |
 | 頭文字(50音) | initial | | あ |
 | 女優ID | actress_id | | 15365 |
 | キーワード | keyword | | あさみ |
@@ -200,7 +200,7 @@ https://api.dmm.com/affiliate/v3/MakerSearch
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 |
 | フロアID | floor_id | ○ | 43 |
 | 頭文字(50音) | initial | | あ |
 | 取得件数 | hits | | 100 (最大500) |
@@ -229,7 +229,7 @@ https://api.dmm.com/affiliate/v3/SeriesSearch
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 |
 | フロアID | floor_id | ○ | 43 |
 | 頭文字(50音) | initial | | お |
 | 取得件数 | hits | | 100 (最大500) |
@@ -251,7 +251,7 @@ https://api.dmm.com/affiliate/v3/AuthorSearch
 | 論理名 | 物理名 | 必須 | 値のサンプル |
 |--------|--------|------|--------------|
 | API ID | api_id | ○ | a2BXCsL2MVUtUeuFBZ1h |
-| アフィリエイトID | affiliate_id | ○ | yoru365-990 |
+| アフィリエイトID | affiliate_id | ○ | yoru365-002 |
 | フロアID | floor_id | ○ | 43 |
 | 読み仮名 | initial | | う |
 | 取得件数 | hits | | 100 (最大500) |
