@@ -487,7 +487,7 @@
         
         <!-- FANZA TV リンク -->
         <div style="text-align: center; margin-bottom: 30px;">
-            <a href="https://al.dmm.co.jp/?lurl=https%3A%2F%2Fpremium.dmm.co.jp%2F&af_id=yoru365-002&ch=link_tool&ch_id=link" 
+            <a href="https://al.dmm.co.jp/?lurl=https%3A%2F%2Fpremium.dmm.co.jp%2F&af_id=yoru365-990&ch=link_tool&ch_id=link" 
                target="_blank" 
                rel="noopener noreferrer"
                style="display: inline-block; background: linear-gradient(135deg, #ff3366 0%, #ff6b9d 100%); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4); transition: all 0.3s;"
@@ -556,686 +556,350 @@
         <h2 class="section-title">⭐ 人気女優 出演作品</h2>
         
         <h3 class="section-title" style="font-size: 18px;">松本いちか 出演作品 TOP 6</h3>
-        <div id="actress-1054998" class="products-grid-6">
+        <div id="actress-matsumoto" class="products-grid-6">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
         <h3 class="section-title" style="font-size: 18px;">美園和花 出演作品 TOP 6</h3>
-        <div id="actress-1135554" class="products-grid-6">
+        <div id="actress-misono" class="products-grid-6">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
         <h3 class="section-title" style="font-size: 18px;">沙月恵奈 出演作品 TOP 6</h3>
-        <div id="actress-1073158" class="products-grid-6">
+        <div id="actress-satsuki" class="products-grid-6">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
         <h3 class="section-title" style="font-size: 18px;">弥生みづき 出演作品 TOP 6</h3>
-        <div id="actress-1050071" class="products-grid-6">
+        <div id="actress-yayoi" class="products-grid-6">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
         <h3 class="section-title" style="font-size: 18px;">逢沢みゆ 出演作品 TOP 6</h3>
-        <div id="actress-1107799" class="products-grid-6">
+        <div id="actress-aizawa" class="products-grid-6">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
         <div class="credit">
             <p class="credit-text">Powered by <a href="https://affiliate.dmm.com/api/" target="_blank" rel="noopener noreferrer" style="color: #ff3366; text-decoration: none;">FANZA Webサービス</a></p>
+            <p class="credit-text" style="font-size: 10px; margin-top: 10px;">Last Updated: <span id="last-updated"></span></p>
         </div>
     </div>
 
 <script>
-        // 定数を最初に定義
-        const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
-        const AFFILIATE_ID = 'yoru365-002';
-        let currentLang = 'ja';
+const AFFILIATE_ID = 'yoru365-990';
+let currentLang = 'ja';
+let fanzaData = null;
+
+// キーワード設定
+const KEYWORDS = [
+    { text: { ja: '熟女', en: 'MILF', es: 'Mujer Madura' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1014%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link' },
+    { text: { ja: '人妻', en: 'Married Woman', es: 'Mujer Casada' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1039%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link' },
+    { text: { ja: '中出し', en: 'Creampie', es: 'Creampie' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D5001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link' },
+    { text: { ja: '寝取り', en: 'Cuckold', es: 'Cornudo' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D4111%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link' },
+    { text: { ja: '巨乳', en: 'Big Breasts', es: 'Pechos Grandes' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D2001%2Fsort%3Ddate%2F&af_id=yoru365-990&ch=link_tool&ch_id=link' }
+];
+
+// 全ジャンルリスト（一部抜粋、実際はもっと多い）
+const ALL_GENRES = [
+    {id: 1014, name: {ja: '熟女', en: 'MILF', es: 'MILF'}},
+    {id: 1039, name: {ja: '人妻・主婦', en: 'Married Woman', es: 'Mujer Casada'}},
+    {id: 5001, name: {ja: '中出し', en: 'Creampie', es: 'Creampie'}},
+    {id: 4111, name: {ja: '寝取り・寝取られ・NTR', en: 'NTR/Cuckold', es: 'NTR/Cornudo'}},
+    {id: 2001, name: {ja: '巨乳', en: 'Big Tits', es: 'Tetas Grandes'}},
+    {id: 1031, name: {ja: '痴女', en: 'Slut', es: 'Puta'}},
+    {id: 1027, name: {ja: '美少女', en: 'Beautiful Girl', es: 'Chica Hermosa'}},
+    {id: 4024, name: {ja: '素人', en: 'Amateur', es: 'Amateur'}},
+    {id: 1018, name: {ja: '女子校生', en: 'Schoolgirl', es: 'Colegiala'}},
+    {id: 1001, name: {ja: 'OL', en: 'Office Lady', es: 'Oficinista'}}
+];
+
+// 多言語翻訳
+const translations = {
+    ja: {
+        warning: '⚠️ 18歳未満の方は閲覧できません',
+        titleTemplate: '{year}年{month}月{day}日の人気無料エロ動画',
+        fanzaTvBtn: 'FANZA TV で見放題を楽しむ',
+        keywordSectionTitle: '新着の無料動画を探す',
+        freeIcon: 'FREE',
+        viewDetails: 'サンプル動画を見る',
+        accordionTitle: '📋 あなたのフェチに合うジャンルはある？　全ジャンル一覧（50音順）　　　閉じる→　',
+        loading: '読み込み中...',
+        noContent: 'コンテンツが見つかりません'
+    },
+    en: {
+        warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
+        titleTemplate: 'Popular Free Adult Videos - {month}/{day}/{year}',
+        fanzaTvBtn: 'Watch Unlimited on FANZA TV',
+        keywordSectionTitle: 'Find New Free Videos',
+        freeIcon: 'FREE',
+        viewDetails: 'Watch Sample',
+        accordionTitle: '📋 All Genres (A-Z)',
+        loading: 'Loading...',
+        noContent: 'No content found'
+    },
+    es: {
+        warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
+        titleTemplate: 'Videos Adultos Gratis Populares - {day}/{month}/{year}',
+        fanzaTvBtn: 'Ver Ilimitado en FANZA TV',
+        keywordSectionTitle: 'Buscar Nuevos Videos Gratis',
+        freeIcon: 'GRATIS',
+        viewDetails: 'Ver Muestra',
+        accordionTitle: '📋 Todos los Géneros',
+        loading: 'Cargando...',
+        noContent: 'No se encontró contenido'
+    }
+};
+
+// JSONデータを読み込み
+async function loadFanzaData() {
+    try {
+        console.log('🔄 Loading FANZA data from JSON...');
+        const response = await fetch('data/fanza_data.json');
         
-        // 全データをロードする関数
-        function loadAllContent() {
-            loadGenreRanking(5001, 'creampie-ranking', 10);
-            loadGenreRanking(2001, 'bigbreasts-ranking', 10);
-            loadGenreRanking(1014, 'milf-ranking', 10);
-            loadFloorRanking('videoc', 'amateur-review', 'review', 10, 'FANZA');
-            loadFloorRanking('anime', 'anime-new', 'date', 10, 'FANZA');
-            loadActressWorksByName('松本いちか', 'actress-1054998', 6);
-            loadActressWorksByName('美園和花', 'actress-1135554', 6);
-            loadActressWorksByName('沙月恵奈', 'actress-1073158', 6);
-            loadActressWorksByName('弥生みづき', 'actress-1050071', 6);
-            loadActressWorksByName('逢沢みゆ', 'actress-1107799', 6);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // 年齢確認機能
-        async function checkAgeVerification() {
-            const isVerified = localStorage.getItem('ageVerified') === 'true';
-            if (isVerified) {
-                document.getElementById('age-verification-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                await loadAllContent();
-            }
-        }
-
-        // ページ読み込み時に年齢確認をチェック
-        checkAgeVerification();
-
-        // 18歳以上ボタンのイベント
-        const btnEnter = document.getElementById('btn-enter');
-        if (btnEnter) {
-            btnEnter.addEventListener('click', async function() {
-                localStorage.setItem('ageVerified', 'true');
-                document.getElementById('age-verification-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                await loadAllContent();
-            });
-        }
+        fanzaData = await response.json();
+        console.log('✅ FANZA data loaded successfully!');
+        console.log(`📦 Updated at: ${fanzaData.updated_at}`);
         
-        // アコーディオントグル
-        function toggleAccordion() {
-            const content = document.getElementById('accordion-content');
-            const icon = document.getElementById('accordion-icon');
-            content.classList.toggle('open');
-            icon.classList.toggle('open');
-        }
+        // 更新日時を表示
+        const updatedDate = new Date(fanzaData.updated_at);
+        document.getElementById('last-updated').textContent = updatedDate.toLocaleString('ja-JP');
         
-        // キーワード設定
-        const KEYWORDS = [
-            { text: { ja: '熟女', en: 'MILF', es: 'Mujer Madura' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1014%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' },
-            { text: { ja: '人妻', en: 'Married Woman', es: 'Mujer Casada' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1039%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' },
-            { text: { ja: '中出し', en: 'Creampie', es: 'Creampie' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D5001%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' },
-            { text: { ja: '寝取り', en: 'Cuckold', es: 'Cornudo' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D4111%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' },
-            { text: { ja: '巨乳', en: 'Big Breasts', es: 'Pechos Grandes' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D2001%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' }
-        ];
+        return true;
+    } catch (error) {
+        console.error('❌ Error loading FANZA data:', error);
+        return false;
+    }
+}
 
-        // 全ジャンルリスト（50音順）
-        const ALL_GENRES = [
-            {id: 4118, name: {ja: 'アイドル・芸能人', en: 'Idol/Celebrity', es: 'Ídolo/Celebridad'}},
-            {id: 514, name: {ja: 'アクション・格闘', en: 'Action/Fighting', es: 'Acción/Lucha'}},
-            {id: 6968, name: {ja: 'アクメ・オーガズム', en: 'Orgasm', es: 'Orgasmo'}},
-            {id: 2011, name: {ja: 'アジア女優', en: 'Asian Actress', es: 'Actriz Asiática'}},
-            {id: 5048, name: {ja: '足コキ', en: 'Footjob', es: 'Trabajo con Pies'}},
-            {id: 4008, name: {ja: '脚フェチ', en: 'Leg Fetish', es: 'Fetiche de Piernas'}},
-            {id: 6965, name: {ja: 'アスリート', en: 'Athlete', es: 'Atleta'}},
-            {id: 5075, name: {ja: '汗だく', en: 'Sweaty', es: 'Sudoroso'}},
-            {id: 5005, name: {ja: 'アナル', en: 'Anal', es: 'Anal'}},
-            {id: 5076, name: {ja: 'アナルセックス', en: 'Anal Sex', es: 'Sexo Anal'}},
-            {id: 4073, name: {ja: 'アニメ', en: 'Anime', es: 'Anime'}},
-            {id: 4057, name: {ja: '姉・妹', en: 'Sister', es: 'Hermana'}},
-            {id: 4122, name: {ja: 'イタズラ', en: 'Prank', es: 'Broma'}},
-            {id: 72, name: {ja: '異物挿入', en: 'Object Insertion', es: 'Inserción de Objetos'}},
-            {id: 6014, name: {ja: 'イメージビデオ', en: 'Image Video', es: 'Video de Imagen'}},
-            {id: 6170, name: {ja: 'イメージビデオ（男性）', en: 'Image Video (Male)', es: 'Video de Imagen (Masculino)'}},
-            {id: 5068, name: {ja: 'イラマチオ', en: 'Deep Throat', es: 'Garganta Profunda'}},
-            {id: 5025, name: {ja: '淫語', en: 'Dirty Talk', es: 'Palabras Sucias'}},
-            {id: 1004, name: {ja: 'インストラクター', en: 'Instructor', es: 'Instructor'}},
-            {id: 6063, name: {ja: 'インディーズ', en: 'Indie', es: 'Independiente'}},
-            {id: 5012, name: {ja: '飲尿', en: 'Drinking Urine', es: 'Bebiendo Orina'}},
-            {id: 4030, name: {ja: '淫乱・ハード系', en: 'Hardcore', es: 'Hardcore'}},
-            {id: 1040, name: {ja: 'ウェイトレス', en: 'Waitress', es: 'Camarera'}},
-            {id: 6942, name: {ja: '受付嬢', en: 'Receptionist', es: 'Recepcionista'}},
-            {id: 307966, name: {ja: 'AI生成作品', en: 'AI Generated', es: 'Generado por IA'}},
-            {id: 4075, name: {ja: 'SF', en: 'Sci-Fi', es: 'Ciencia Ficción'}},
-            {id: 4001, name: {ja: 'SM', en: 'SM', es: 'SM'}},
-            {id: 4119, name: {ja: 'エステ', en: 'Massage Parlor', es: 'Salón de Masajes'}},
-            {id: 5074, name: {ja: 'M男', en: 'Submissive Male', es: 'Hombre Sumiso'}},
-            {id: 6967, name: {ja: 'M女', en: 'Submissive Female', es: 'Mujer Sumisa'}},
-            {id: 1001, name: {ja: 'OL', en: 'Office Lady', es: 'Oficinista'}},
-            {id: 1032, name: {ja: 'お母さん', en: 'Mother', es: 'Madre'}},
-            {id: 1003, name: {ja: '女将・女主人', en: 'Landlady', es: 'Patrona'}},
-            {id: 1083, name: {ja: '幼なじみ', en: 'Childhood Friend', es: 'Amiga de Infancia'}},
-            {id: 6934, name: {ja: 'お爺ちゃん', en: 'Grandfather', es: 'Abuelo'}},
-            {id: 527, name: {ja: 'お嬢様・令嬢', en: 'Young Lady', es: 'Señorita'}},
-            {id: 6954, name: {ja: 'オタク', en: 'Otaku', es: 'Otaku'}},
-            {id: 6948, name: {ja: '男の潮吹き', en: 'Male Squirting', es: 'Eyaculación Masculina'}},
-            {id: 6938, name: {ja: 'オナサポ', en: 'Masturbation Support', es: 'Apoyo a la Masturbación'}},
-            {id: 5008, name: {ja: 'オナニー', en: 'Masturbation', es: 'Masturbación'}},
-            {id: 1033, name: {ja: 'お姉さん', en: 'Older Sister', es: 'Hermana Mayor'}},
-            {id: 6947, name: {ja: 'お婆ちゃん', en: 'Grandmother', es: 'Abuela'}},
-            {id: 6943, name: {ja: '叔母さん', en: 'Aunt', es: 'Tía'}},
-            {id: 528, name: {ja: 'お姫様', en: 'Princess', es: 'Princesa'}},
-            {id: 6969, name: {ja: 'お風呂', en: 'Bath', es: 'Baño'}},
-            {id: 5017, name: {ja: 'おもちゃ', en: 'Toy', es: 'Juguete'}},
-            {id: 4140, name: {ja: '温泉', en: 'Hot Spring', es: 'Aguas Termales'}},
-            {id: 1016, name: {ja: '女教師', en: 'Female Teacher', es: 'Maestra'}},
-            {id: 6945, name: {ja: '女上司', en: 'Female Boss', es: 'Jefa'}},
-            {id: 1082, name: {ja: '女戦士', en: 'Female Warrior', es: 'Guerrera'}},
-            {id: 2022, name: {ja: '女捜査官', en: 'Female Detective', es: 'Detective Femenina'}},
-            {id: 4026, name: {ja: 'カーセックス', en: 'Car Sex', es: 'Sexo en el Coche'}},
-            {id: 553, name: {ja: '学園もの', en: 'School', es: 'Escuela'}},
-            {id: 3011, name: {ja: '学生服', en: 'School Uniform', es: 'Uniforme Escolar'}},
-            {id: 1021, name: {ja: '格闘家', en: 'Fighter', es: 'Luchador'}},
-            {id: 4123, name: {ja: 'カップル', en: 'Couple', es: 'Pareja'}},
-            {id: 1022, name: {ja: '家庭教師', en: 'Tutor', es: 'Tutor'}},
-            {id: 5010, name: {ja: '監禁', en: 'Confinement', es: 'Confinamiento'}},
-            {id: 1013, name: {ja: '看護婦・ナース', en: 'Nurse', es: 'Enfermera'}},
-            {id: 5023, name: {ja: '顔射', en: 'Facial', es: 'Facial'}},
-            {id: 5014, name: {ja: '浣腸', en: 'Enema', es: 'Enema'}},
-            {id: 5067, name: {ja: '顔面騎乗', en: 'Face Sitting', es: 'Sentarse en la Cara'}},
-            {id: 4007, name: {ja: '企画', en: 'Planning', es: 'Planificación'}},
-            {id: 4106, name: {ja: '騎乗位', en: 'Cowgirl', es: 'Vaquera'}},
-            {id: 4059, name: {ja: 'キス・接吻', en: 'Kiss', es: 'Beso'}},
-            {id: 567, name: {ja: '鬼畜', en: 'Brutal', es: 'Brutal'}},
-            {id: 524, name: {ja: '義母', en: 'Stepmother', es: 'Madrastra'}},
-            {id: 5, name: {ja: 'ギャグ・コメディ', en: 'Comedy', es: 'Comedia'}},
-            {id: 4120, name: {ja: '逆ナン', en: 'Reverse Pickup', es: 'Recogida Inversa'}},
-            {id: 1036, name: {ja: 'キャバ嬢・風俗嬢', en: 'Hostess', es: 'Anfitriona'}},
-            {id: 1034, name: {ja: 'ギャル', en: 'Gal', es: 'Chica'}},
-            {id: 1005, name: {ja: 'キャンギャル', en: 'Campaign Girl', es: 'Chica de Campaña'}},
-            {id: 3009, name: {ja: '競泳・スクール水着', en: 'Swimsuit', es: 'Traje de Baño'}},
-            {id: 4017, name: {ja: '局部アップ', en: 'Close Up', es: 'Primer Plano'}},
-            {id: 2024, name: {ja: '巨尻', en: 'Big Ass', es: 'Culo Grande'}},
-            {id: 2001, name: {ja: '巨乳', en: 'Big Tits', es: 'Tetas Grandes'}},
-            {id: 4009, name: {ja: '巨乳フェチ', en: 'Big Tits Fetish', es: 'Fetiche de Tetas Grandes'}},
-            {id: 6017, name: {ja: 'ギリモザ', en: 'Minimal Mosaic', es: 'Mosaico Mínimo'}},
-            {id: 4002, name: {ja: '近親相姦', en: 'Incest', es: 'Incesto'}},
-            {id: 97, name: {ja: '筋肉', en: 'Muscle', es: 'Músculo'}},
-            {id: 5069, name: {ja: 'くすぐり', en: 'Tickling', es: 'Cosquillas'}},
-            {id: 5007, name: {ja: 'クスコ', en: 'Speculum', es: 'Espéculo'}},
-            {id: 1075, name: {ja: 'くノ一', en: 'Female Ninja', es: 'Ninja Femenina'}},
-            {id: 4033, name: {ja: 'クラシック', en: 'Classic', es: 'Clásico'}},
-            {id: 38, name: {ja: 'クンニ', en: 'Cunnilingus', es: 'Cunnilingus'}},
-            {id: 4060, name: {ja: 'ゲイ', en: 'Gay', es: 'Gay'}},
-            {id: 6597, name: {ja: 'ゲーム実写版', en: 'Game Adaptation', es: 'Adaptación de Juego'}},
-            {id: 2003, name: {ja: 'ゲロ', en: 'Vomit', es: 'Vómito'}},
-            {id: 4138, name: {ja: '原作コラボ', en: 'Original Collab', es: 'Colaboración Original'}},
-            {id: 25, name: {ja: '拘束', en: 'Bondage', es: 'Bondage'}},
-            {id: 5059, name: {ja: '拷問', en: 'Torture', es: 'Tortura'}},
-            {id: 2003, name: {ja: '小柄', en: 'Petite', es: 'Pequeña'}},
-            {id: 1028, name: {ja: '黒人男優', en: 'Black Actor', es: 'Actor Negro'}},
-            {id: 1071, name: {ja: '極道・任侠', en: 'Yakuza', es: 'Yakuza'}},
-            {id: 4031, name: {ja: 'コスプレ', en: 'Cosplay', es: 'Cosplay'}},
-            {id: 5009, name: {ja: 'ごっくん', en: 'Swallowing', es: 'Tragando'}},
-            {id: 6574, name: {ja: 'コラボ作品', en: 'Collaboration', es: 'Colaboración'}},
-            {id: 1041, name: {ja: 'コンパニオン', en: 'Companion', es: 'Acompañante'}},
-            {id: 6069, name: {ja: 'サイコ・スリラー', en: 'Psycho Thriller', es: 'Thriller Psicológico'}},
-            {id: 21, name: {ja: '残虐表現', en: 'Brutal Expression', es: 'Expresión Brutal'}},
-            {id: 5022, name: {ja: '3P・4P', en: '3P/4P', es: '3P/4P'}},
-            {id: 5016, name: {ja: '潮吹き', en: 'Squirting', es: 'Squirting'}},
-            {id: 5070, name: {ja: '時間停止', en: 'Time Stop', es: 'Parada del Tiempo'}},
-            {id: 5020, name: {ja: 'シックスナイン', en: '69', es: '69'}},
-            {id: 5021, name: {ja: '縛り・緊縛', en: 'Tied/Bondage', es: 'Atado/Bondage'}},
-            {id: 28, name: {ja: '羞恥', en: 'Shame', es: 'Vergüenza'}},
-            {id: 6609, name: {ja: '16時間以上作品', en: '16+ Hours', es: 'Más de 16 Horas'}},
-            {id: 5063, name: {ja: '主観', en: 'POV', es: 'POV'}},
-            {id: 1014, name: {ja: '熟女', en: 'MILF', es: 'MILF'}},
-            {id: 1015, name: {ja: '女医', en: 'Female Doctor', es: 'Doctora'}},
-            {id: 6944, name: {ja: '女王様', en: 'Queen', es: 'Reina'}},
-            {id: 1026, name: {ja: '職業色々', en: 'Various Occupations', es: 'Varias Ocupaciones'}},
-            {id: 62, name: {ja: '触手', en: 'Tentacle', es: 'Tentáculo'}},
-            {id: 5024, name: {ja: '食糞', en: 'Scat', es: 'Scat'}},
-            {id: 1017, name: {ja: '女子アナ', en: 'Female Announcer', es: 'Presentadora'}},
-            {id: 1018, name: {ja: '女子校生', en: 'Schoolgirl', es: 'Colegiala'}},
-            {id: 1019, name: {ja: '女子大生', en: 'College Girl', es: 'Universitaria'}},
-            {id: 55, name: {ja: '処女', en: 'Virgin', es: 'Virgen'}},
-            {id: 35, name: {ja: '女性向け', en: 'For Women', es: 'Para Mujeres'}},
-            {id: 3036, name: {ja: '女装・男の娘', en: 'Crossdressing', es: 'Travestismo'}},
-            {id: 4058, name: {ja: 'ショタ', en: 'Shota', es: 'Shota'}},
-            {id: 6608, name: {ja: '女優ベスト・総集編', en: 'Actress Best', es: 'Lo Mejor de la Actriz'}},
-            {id: 4011, name: {ja: '尻フェチ', en: 'Ass Fetish', es: 'Fetiche de Culo'}},
-            {id: 4024, name: {ja: '素人', en: 'Amateur', es: 'Amateur'}},
-            {id: 6966, name: {ja: '白目・失神', en: 'Eye Rolling', es: 'Ojos en Blanco'}},
-            {id: 4018, name: {ja: 'スカトロ', en: 'Scat', es: 'Scat'}},
-            {id: 1007, name: {ja: 'スチュワーデス', en: 'Flight Attendant', es: 'Azafata'}},
-            {id: 6940, name: {ja: 'スパンキング', en: 'Spanking', es: 'Nalgadas'}},
-            {id: 4096, name: {ja: 'スポーツ', en: 'Sports', es: 'Deportes'}},
-            {id: 6671, name: {ja: 'スマホ推奨縦動画', en: 'Vertical Video', es: 'Video Vertical'}},
-            {id: 617, name: {ja: '3D', en: '3D', es: '3D'}},
-            {id: 2006, name: {ja: 'スレンダー', en: 'Slender', es: 'Esbelta'}},
-            {id: 6970, name: {ja: 'スワッピング・夫婦交換', en: 'Swapping', es: 'Intercambio'}},
-            {id: 95, name: {ja: '性転換・女体化', en: 'Gender Change', es: 'Cambio de Género'}},
-            {id: 48, name: {ja: '制服', en: 'Uniform', es: 'Uniforme'}},
-            {id: 3003, name: {ja: 'セーラー服', en: 'Sailor Uniform', es: 'Uniforme de Marinero'}},
-            {id: 4098, name: {ja: 'セクシー', en: 'Sexy', es: 'Sexy'}},
-            {id: 7267, name: {ja: 'セット商品', en: 'Set Product', es: 'Producto en Set'}},
-            {id: 6955, name: {ja: 'セレブ', en: 'Celebrity', es: 'Celebridad'}},
-            {id: 5072, name: {ja: '早漏', en: 'Premature', es: 'Prematuro'}},
-            {id: 3029, name: {ja: '即ハメ', en: 'Instant Sex', es: 'Sexo Instantáneo'}},
-            {id: 1030, name: {ja: 'そっくりさん', en: 'Lookalike', es: 'Parecido'}},
-            {id: 6007, name: {ja: 'その他', en: 'Other', es: 'Otro'}},
-            {id: 4010, name: {ja: 'その他フェチ', en: 'Other Fetish', es: 'Otro Fetiche'}},
-            {id: 568, name: {ja: 'ダーク系', en: 'Dark', es: 'Oscuro'}},
-            {id: 6086, name: {ja: '体験告白', en: 'Confession', es: 'Confesión'}},
-            {id: 3001, name: {ja: '体操着・ブルマ', en: 'Gym Clothes', es: 'Ropa de Gimnasia'}},
-            {id: 308409, name: {ja: '台湾モデル', en: 'Taiwan Model', es: 'Modelo Taiwanés'}},
-            {id: 5013, name: {ja: '脱糞', en: 'Defecation', es: 'Defecación'}},
-            {id: 4105, name: {ja: 'ダンス', en: 'Dance', es: 'Baile'}},
-            {id: 4025, name: {ja: '単体作品', en: 'Solo Work', es: 'Trabajo en Solitario'}},
-            {id: 6959, name: {ja: 'チアガール', en: 'Cheerleader', es: 'Animadora'}},
-            {id: 1031, name: {ja: '痴女', en: 'Slut', es: 'Puta'}},
-            {id: 3005, name: {ja: 'チャイナドレス', en: 'China Dress', es: 'Vestido Chino'}},
-            {id: 4116, name: {ja: '着エロ', en: 'Clothed Ero', es: 'Erótico Vestido'}},
-            {id: 2002, name: {ja: '長身', en: 'Tall', es: 'Alta'}},
-            {id: 6149, name: {ja: '超乳', en: 'Super Big Tits', es: 'Tetas Súper Grandes'}},
-            {id: 2019, name: {ja: 'ツンデレ', en: 'Tsundere', es: 'Tsundere'}},
-            {id: 6941, name: {ja: 'ディルド', en: 'Dildo', es: 'Consolador'}},
-            {id: 6956, name: {ja: 'デート', en: 'Date', es: 'Cita'}},
-            {id: 5073, name: {ja: 'デカチン・巨根', en: 'Big Dick', es: 'Polla Grande'}},
-            {id: 5004, name: {ja: '手コキ', en: 'Handjob', es: 'Paja'}},
-            {id: 6004, name: {ja: 'デジモ', en: 'Digital Mosaic', es: 'Mosaico Digital'}},
-            {id: 6006, name: {ja: 'デビュー作品', en: 'Debut', es: 'Debut'}},
-            {id: 5066, name: {ja: '電マ', en: 'Vibrator', es: 'Vibrador'}},
-            {id: 6005, name: {ja: '投稿', en: 'Submission', es: 'Sumisión'}},
-            {id: 4021, name: {ja: '盗撮・のぞき', en: 'Voyeur', es: 'Voyeur'}},
-            {id: 4014, name: {ja: '童貞', en: 'Virgin Male', es: 'Virgen Masculino'}},
-            {id: 42, name: {ja: 'ドール', en: 'Doll', es: 'Muñeca'}},
-            {id: 4023, name: {ja: 'ドキュメンタリー', en: 'Documentary', es: 'Documental'}},
-            {id: 4034, name: {ja: '特撮', en: 'Special Effects', es: 'Efectos Especiales'}},
-            {id: 6548, name: {ja: '独占配信', en: 'Exclusive', es: 'Exclusivo'}},
-            {id: 5015, name: {ja: 'ドラッグ', en: 'Drug', es: 'Droga'}},
-            {id: 4114, name: {ja: 'ドラマ', en: 'Drama', es: 'Drama'}},
-            {id: 5001, name: {ja: '中出し', en: 'Creampie', es: 'Creampie'}},
-            {id: 6935, name: {ja: '軟体', en: 'Flexible', es: 'Flexible'}},
-            {id: 4006, name: {ja: 'ナンパ', en: 'Pickup', es: 'Recogida'}},
-            {id: 94, name: {ja: 'ニーソックス', en: 'Knee Socks', es: 'Calcetines Altos'}},
-            {id: 4015, name: {ja: 'ニューハーフ', en: 'Shemale', es: 'Transexual'}},
-            {id: 1029, name: {ja: '妊婦', en: 'Pregnant', es: 'Embarazada'}},
-            {id: 64, name: {ja: 'ネコミミ・獣系', en: 'Cat Ears/Beast', es: 'Orejas de Gato/Bestia'}},
-            {id: 4111, name: {ja: '寝取り・寝取られ・NTR', en: 'NTR/Cuckold', es: 'NTR/Cornudo'}},
-            {id: 6964, name: {ja: 'ノーパン', en: 'No Panties', es: 'Sin Bragas'}},
-            {id: 6972, name: {ja: 'ノーブラ', en: 'No Bra', es: 'Sin Sujetador'}},
-            {id: 6957, name: {ja: '飲み会・合コン', en: 'Party', es: 'Fiesta'}},
-            {id: 5071, name: {ja: 'ハーレム', en: 'Harem', es: 'Harén'}},
-            {id: 6925, name: {ja: 'ハイクオリティVR', en: 'High Quality VR', es: 'VR de Alta Calidad'}},
-            {id: 5019, name: {ja: 'パイズリ', en: 'Titty Fuck', es: 'Tetas Fuck'}},
-            {id: 4019, name: {ja: 'パイパン', en: 'Shaved', es: 'Afeitado'}},
-            {id: 6533, name: {ja: 'ハイビジョン', en: 'HD', es: 'HD'}},
-            {id: 5006, name: {ja: 'バイブ', en: 'Vibrator', es: 'Vibrador'}},
-            {id: 6070, name: {ja: 'How To', en: 'How To', es: 'Cómo Hacer'}},
-            {id: 2012, name: {ja: '白人女優', en: 'Caucasian Actress', es: 'Actriz Caucásica'}},
-            {id: 1012, name: {ja: 'バスガイド', en: 'Bus Guide', es: 'Guía de Autobús'}},
-            {id: 27, name: {ja: '辱め', en: 'Humiliation', es: 'Humillación'}},
-            {id: 6070, name: {ja: '裸エプロン', en: 'Naked Apron', es: 'Delantal Desnudo'}},
-            {id: 307935, name: {ja: '8KVR', en: '8K VR', es: '8K VR'}},
-            {id: 6958, name: {ja: 'バック', en: 'Doggy Style', es: 'Estilo Perrito'}},
-            {id: 6949, name: {ja: '罵倒', en: 'Verbal Abuse', es: 'Abuso Verbal'}},
-            {id: 6950, name: {ja: '鼻フック', en: 'Nose Hook', es: 'Gancho Nasal'}},
-            {id: 6974, name: {ja: '花嫁', en: 'Bride', es: 'Novia'}},
-            {id: 3033, name: {ja: 'バニーガール', en: 'Bunny Girl', es: 'Chica Conejito'}},
-            {id: 6002, name: {ja: 'ハメ撮り', en: 'Gonzo', es: 'Gonzo'}},
-            {id: 96, name: {ja: '孕ませ', en: 'Impregnation', es: 'Impregnación'}},
-            {id: 3006, name: {ja: 'パンスト・タイツ', en: 'Pantyhose', es: 'Medias'}},
-            {id: 4016, name: {ja: 'パンチラ', en: 'Panty Shot', es: 'Panty Shot'}},
-            {id: 6939, name: {ja: 'ビジネススーツ', en: 'Business Suit', es: 'Traje de Negocios'}},
-            {id: 1023, name: {ja: '秘書', en: 'Secretary', es: 'Secretaria'}},
-            {id: 1027, name: {ja: '美少女', en: 'Beautiful Girl', es: 'Chica Hermosa'}},
-            {id: 6164, name: {ja: 'ビッチ', en: 'Bitch', es: 'Perra'}},
-            {id: 1039, name: {ja: '人妻・主婦', en: 'Married Woman', es: 'Mujer Casada'}},
-            {id: 102, name: {ja: '美乳', en: 'Beautiful Breasts', es: 'Pechos Hermosos'}},
-            {id: 2023, name: {ja: '日焼け', en: 'Tanned', es: 'Bronceada'}},
-            {id: 6963, name: {ja: '病院・クリニック', en: 'Hospital', es: 'Hospital'}},
-            {id: 2005, name: {ja: '貧乳・微乳', en: 'Small Tits', es: 'Tetas Pequeñas'}},
-            {id: 4139, name: {ja: 'ファン感謝・訪問', en: 'Fan Appreciation', es: 'Agradecimiento de Fans'}},
-            {id: 6566, name: {ja: 'FANZA配信限定', en: 'FANZA Exclusive', es: 'Exclusivo de FANZA'}},
-            {id: 17, name: {ja: 'ファンタジー', en: 'Fantasy', es: 'Fantasía'}},
-            {id: 6793, name: {ja: 'VR専用', en: 'VR Only', es: 'Solo VR'}},
-            {id: 4110, name: {ja: 'Vシネマ', en: 'V-Cinema', es: 'V-Cinema'}},
-            {id: 88, name: {ja: 'フィスト', en: 'Fisting', es: 'Fisting'}},
-            {id: 5002, name: {ja: 'フェラ', en: 'Blowjob', es: 'Mamada'}},
-            {id: 6961, name: {ja: '部活・マネージャー', en: 'Club Manager', es: 'Gerente de Club'}},
-            {id: 6946, name: {ja: '部下・同僚', en: 'Subordinate', es: 'Subordinado'}},
-            {id: 81, name: {ja: '複数話', en: 'Multiple Stories', es: 'Historias Múltiples'}},
-            {id: 300129, name: {ja: '福袋', en: 'Lucky Bag', es: 'Bolsa de Suerte'}},
-            {id: 6951, name: {ja: '覆面・マスク', en: 'Mask', es: 'Máscara'}},
-            {id: 59, name: {ja: 'ふたなり', en: 'Futanari', es: 'Futanari'}},
-            {id: 5003, name: {ja: 'ぶっかけ', en: 'Bukkake', es: 'Bukkake'}},
-            {id: 6555, name: {ja: '復刻', en: 'Reprint', es: 'Reimpresión'}},
-            {id: 1069, name: {ja: '不倫', en: 'Affair', es: 'Aventura'}},
-            {id: 6003, name: {ja: 'ベスト・総集編', en: 'Best/Compilation', es: 'Mejor/Compilación'}},
-            {id: 6937, name: {ja: 'ヘルス・ソープ', en: 'Soapland', es: 'Soapland'}},
-            {id: 1085, name: {ja: '変身ヒロイン', en: 'Transform Heroine', es: 'Heroína Transformada'}},
-            {id: 6952, name: {ja: '放置', en: 'Neglect', es: 'Descuido'}},
-            {id: 5011, name: {ja: '放尿・お漏らし', en: 'Urination', es: 'Orinación'}},
-            {id: 558, name: {ja: 'BL（ボーイズラブ）', en: 'BL (Boys Love)', es: 'BL (Amor entre Chicos)'}},
-            {id: 2007, name: {ja: 'ぽっちゃり', en: 'Chubby', es: 'Gordita'}},
-            {id: 3013, name: {ja: 'ボディコン', en: 'Body Con', es: 'Body Con'}},
-            {id: 6962, name: {ja: 'ホテル', en: 'Hotel', es: 'Hotel'}},
-            {id: 5060, name: {ja: '母乳', en: 'Breast Milk', es: 'Leche Materna'}},
-            {id: 18, name: {ja: 'ホラー', en: 'Horror', es: 'Horror'}},
-            {id: 6108, name: {ja: 'ポルチオ', en: 'Portio', es: 'Portio'}},
-            {id: 3015, name: {ja: 'ボンテージ', en: 'Bondage', es: 'Bondage'}},
-            {id: 4124, name: {ja: 'マッサージ・リフレ', en: 'Massage', es: 'Masaje'}},
-            {id: 1086, name: {ja: '魔法少女', en: 'Magical Girl', es: 'Chica Mágica'}},
-            {id: 6960, name: {ja: 'ママ友', en: 'Mom Friend', es: 'Amiga Mamá'}},
-            {id: 63, name: {ja: '巫女', en: 'Shrine Maiden', es: 'Doncella del Santuario'}},
-            {id: 3008, name: {ja: '水着', en: 'Swimsuit', es: 'Traje de Baño'}},
-            {id: 2008, name: {ja: 'ミニ系', en: 'Mini', es: 'Mini'}},
-            {id: 3007, name: {ja: 'ミニスカ', en: 'Miniskirt', es: 'Minifalda'}},
-            {id: 3012, name: {ja: 'ミニスカポリス', en: 'Miniskirt Police', es: 'Policía Minifalda'}},
-            {id: 1025, name: {ja: '未亡人', en: 'Widow', es: 'Viuda'}},
-            {id: 6973, name: {ja: '娘・養女', en: 'Daughter', es: 'Hija'}},
-            {id: 6971, name: {ja: '胸チラ', en: 'Cleavage', es: 'Escote'}},
-            {id: 1008, name: {ja: 'メイド', en: 'Maid', es: 'Criada'}},
-            {id: 2004, name: {ja: 'めがね', en: 'Glasses', es: 'Gafas'}},
-            {id: 6936, name: {ja: '面接', en: 'Interview', es: 'Entrevista'}},
-            {id: 4028, name: {ja: '妄想', en: 'Fantasy', es: 'Fantasía'}},
-            {id: 1009, name: {ja: 'モデル', en: 'Model', es: 'Modelo'}},
-            {id: 4020, name: {ja: '野外・露出', en: 'Outdoor/Exposure', es: 'Exterior/Exposición'}},
-            {id: 5053, name: {ja: '指マン', en: 'Fingering', es: 'Dedos'}},
-            {id: 4022, name: {ja: '洋ピン・海外輸入', en: 'Western/Import', es: 'Occidental/Importado'}},
-            {id: 6933, name: {ja: 'ヨガ', en: 'Yoga', es: 'Yoga'}},
-            {id: 6012, name: {ja: '4時間以上作品', en: '4+ Hours', es: 'Más de 4 Horas'}},
-            {id: 79015, name: {ja: '4K', en: '4K', es: '4K'}},
-            {id: 569, name: {ja: 'ラブコメ', en: 'Rom-Com', es: 'Comedia Romántica'}},
-            {id: 4005, name: {ja: '乱交', en: 'Orgy', es: 'Orgía'}},
-            {id: 3014, name: {ja: 'ランジェリー', en: 'Lingerie', es: 'Lencería'}},
-            {id: 6975, name: {ja: '旅行', en: 'Travel', es: 'Viaje'}},
-            {id: 3032, name: {ja: 'ルーズソックス', en: 'Loose Socks', es: 'Calcetines Sueltos'}},
-            {id: 1011, name: {ja: 'レースクィーン', en: 'Race Queen', es: 'Reina de Carreras'}},
-            {id: 3035, name: {ja: 'レオタード', en: 'Leotard', es: 'Leotardo'}},
-            {id: 5062, name: {ja: 'レズキス', en: 'Lesbian Kiss', es: 'Beso Lésbico'}},
-            {id: 4013, name: {ja: 'レズビアン', en: 'Lesbian', es: 'Lesbiana'}},
-            {id: 555, name: {ja: '恋愛', en: 'Romance', es: 'Romance'}},
-            {id: 6953, name: {ja: '蝋燭', en: 'Candle', es: 'Vela'}},
-            {id: 5057, name: {ja: 'ローション・オイル', en: 'Lotion/Oil', es: 'Loción/Aceite'}},
-            {id: 5018, name: {ja: 'ローター', en: 'Rotor', es: 'Rotor'}},
-            {id: 1020, name: {ja: '若妻・幼妻', en: 'Young Wife', es: 'Esposa Joven'}},
-            {id: 3002, name: {ja: '和服・浴衣', en: 'Kimono/Yukata', es: 'Kimono/Yukata'}}
-        ];
+// 全コンテンツを表示
+async function loadAllContent() {
+    const success = await loadFanzaData();
+    
+    if (!success || !fanzaData) {
+        console.error('Failed to load data');
+        showAllErrors();
+        return;
+    }
+    
+    // ランキングデータを表示
+    displayProducts('creampie-ranking', fanzaData.rankings.creampie, true);
+    displayProducts('bigbreasts-ranking', fanzaData.rankings.bigbreasts, true);
+    displayProducts('milf-ranking', fanzaData.rankings.milf, true);
+    
+    // フロアデータを表示
+    displayProducts('amateur-review', fanzaData.floors.amateur, true);
+    displayProducts('anime-new', fanzaData.floors.anime, true);
+    
+    // 女優データを表示
+    displayProducts('actress-matsumoto', fanzaData.actresses['松本いちか'], false);
+    displayProducts('actress-misono', fanzaData.actresses['美園和花'], false);
+    displayProducts('actress-satsuki', fanzaData.actresses['沙月恵奈'], false);
+    displayProducts('actress-yayoi', fanzaData.actresses['弥生みづき'], false);
+    displayProducts('actress-aizawa', fanzaData.actresses['逢沢みゆ'], false);
+    
+    console.log('✅ All content displayed!');
+}
 
-        // 多言語翻訳
-        const translations = {
-            ja: {
-                warning: '⚠️ 18歳未満の方は閲覧できません',
-                titleTemplate: '{year}年{month}月{day}日の人気無料エロ動画',
-                fanzaTvBtn: 'FANZA TV で見放題を楽しむ',
-                keywordSectionTitle: '新着の無料動画を探す',
-                freeIcon: 'FREE',
-                viewDetails: 'サンプル動画を見る',
-                accordionTitle: '📋 あなたのフェチに合うジャンルはある？　全ジャンル一覧（50音順）　　　閉じる→　'
-            },
-            en: {
-                warning: '⚠️ 18+ CONTENT WARNING — Adults Only',
-                titleTemplate: 'Popular Free Adult Videos - {month}/{day}/{year}',
-                fanzaTvBtn: 'Watch Unlimited on FANZA TV',
-                keywordSectionTitle: 'Find New Free Videos',
-                freeIcon: 'FREE',
-                viewDetails: 'Watch Sample',
-                accordionTitle: '📋 All Genres (A-Z)'
-            },
-            es: {
-                warning: '⚠️ ADVERTENCIA +18 — Solo para adultos',
-                titleTemplate: 'Videos Adultos Gratis Populares - {day}/{month}/{year}',
-                fanzaTvBtn: 'Ver Ilimitado en FANZA TV',
-                keywordSectionTitle: 'Buscar Nuevos Videos Gratis',
-                freeIcon: 'GRATIS',
-                viewDetails: 'Ver Muestra',
-                accordionTitle: '📋 Todos los Géneros'
-            }
-        };
-
-        function updateDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth() + 1;
-            const day = today.getDate();
-            
-            const t = translations[currentLang];
-            const title = t.titleTemplate
-                .replace('{year}', year)
-                .replace('{month}', month)
-                .replace('{day}', day);
-            
-            document.getElementById('main-title').textContent = title;
-        }
-
-        function updateUILanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang];
-            
-            document.getElementById('warning').textContent = t.warning;
-            updateDate();
-            document.getElementById('fanza-tv-btn').textContent = t.fanzaTvBtn;
-            document.getElementById('keyword-section-title').innerHTML = 
-                `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
-            document.getElementById('accordion-title').textContent = t.accordionTitle;
-            
-            generateKeywordLinks();
-            generateGenreList();
-            
-            document.querySelectorAll('.product-link').forEach(link => {
-                link.textContent = t.viewDetails;
-            });
-        }
-
-        function generateKeywordLinks() {
-            const container = document.getElementById('keyword-links');
-            container.innerHTML = KEYWORDS.map(keyword => {
-                const text = keyword.text[currentLang];
-                return `
-                    <a href="${keyword.affiliateUrl}" 
-                       class="keyword-link" 
+// 商品を表示
+function displayProducts(containerId, products, showRank) {
+    const container = document.getElementById(containerId);
+    const t = translations[currentLang];
+    
+    if (!container) {
+        console.error(`Container ${containerId} not found!`);
+        return;
+    }
+    
+    if (!products || products.length === 0) {
+        container.innerHTML = `<p class="loading">${t.noContent}</p>`;
+        return;
+    }
+    
+    container.innerHTML = products.map((item, index) => {
+        const imageUrl = item.imageURL?.large || item.imageURL?.small || '';
+        const affiliateUrl = item.affiliateURL || item.URL || '#';
+        const title = (item.title || 'Unknown').replace(/"/g, '&quot;');
+        const rankBadge = showRank ? `<div class="rank-badge">${index + 1}</div>` : '';
+        
+        return `
+            <div class="product">
+                <div class="product-image-wrapper">
+                    ${rankBadge}
+                    <img src="${imageUrl}" 
+                         alt="${title}" 
+                         class="product-image"
+                         loading="lazy">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">${item.title || 'Unknown'}</div>
+                    <a href="${affiliateUrl}" 
+                       class="product-link" 
                        target="_blank" 
                        rel="noopener noreferrer">
-                        ${text}
+                        ${t.viewDetails}
                     </a>
-                `;
-            }).join('');
-        }
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
-        function generateGenreList() {
-            const container = document.getElementById('genre-list');
-            container.innerHTML = ALL_GENRES.map(genre => {
-                const genreName = genre.name[currentLang] || genre.name.ja;
-                const genreUrl = `https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Fdigital%2Fvideoa%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D${genre.id}%2F&af_id=${AFFILIATE_ID}&ch=link_tool&ch_id=link`;
-                return `
-                    <a href="${genreUrl}" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       class="genre-item"
-                       data-genre-id="${genre.id}">
-                        ${genreName}
-                    </a>
-                `;
-            }).join('');
-        }
-
-        // 複数プロキシを試す関数
-        async function fetchWithProxy(apiUrl, timeout = 60000) {
-            const proxies = [
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url=',
-                'https://proxy.cors.sh/',
-                'https://thingproxy.freeboard.io/fetch/'
-            ];
-
-            let lastError = null;
-
-            for (const proxyUrl of proxies) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-                    const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
-                        method: 'GET',
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (response.ok) {
-                        return await response.json();
-                    }
-                } catch (error) {
-                    lastError = error;
-                    console.log(`Proxy ${proxyUrl} failed, trying next...`);
-                    continue;
-                }
-            }
+// エラー表示
+function showAllErrors() {
+    const containers = [
+        'creampie-ranking', 'bigbreasts-ranking', 'milf-ranking',
+        'amateur-review', 'anime-new',
+        'actress-matsumoto', 'actress-misono', 'actress-satsuki',
+        'actress-yayoi', 'actress-aizawa'
+    ];
     
-            throw lastError || new Error('All proxies failed');
+    const t = translations[currentLang];
+    containers.forEach(id => {
+        const container = document.getElementById(id);
+        if (container) {
+            container.innerHTML = `<p class="loading">${t.noContent}</p>`;
         }
+    });
+}
 
-        function filterValidProducts(items, count) {
-            const filtered = items.filter((item) => {
-                if (!item.imageURL) return false;
-                const imageUrl = item.imageURL.large || item.imageURL.small;
-                if (!imageUrl) return false;
-                return true;
+// UI更新関数
+function updateDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    const t = translations[currentLang];
+    const title = t.titleTemplate
+        .replace('{year}', year)
+        .replace('{month}', month)
+        .replace('{day}', day);
+    
+    document.getElementById('main-title').textContent = title;
+}
+
+function updateUILanguage(lang) {
+    currentLang = lang;
+    const t = translations[lang];
+    
+    document.getElementById('warning').textContent = t.warning;
+    updateDate();
+    document.getElementById('fanza-tv-btn').textContent = t.fanzaTvBtn;
+    document.getElementById('keyword-section-title').innerHTML = 
+        `${t.keywordSectionTitle} <span class="free-icon">${t.freeIcon}</span>`;
+    document.getElementById('accordion-title').textContent = t.accordionTitle;
+    
+    generateKeywordLinks();
+    generateGenreList();
+    
+    // 商品リンクのテキストを更新
+    document.querySelectorAll('.product-link').forEach(link => {
+        link.textContent = t.viewDetails;
+    });
+}
+
+function generateKeywordLinks() {
+    const container = document.getElementById('keyword-links');
+    container.innerHTML = KEYWORDS.map(keyword => {
+        const text = keyword.text[currentLang];
+        return `
+            <a href="${keyword.affiliateUrl}" 
+               class="keyword-link" 
+               target="_blank" 
+               rel="noopener noreferrer">
+                ${text}
+            </a>
+        `;
+    }).join('');
+}
+
+function generateGenreList() {
+    const container = document.getElementById('genre-list');
+    container.innerHTML = ALL_GENRES.map(genre => {
+        const genreName = genre.name[currentLang] || genre.name.ja;
+        const genreUrl = `https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Fdigital%2Fvideoa%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D${genre.id}%2F&af_id=${AFFILIATE_ID}&ch=link_tool&ch_id=link`;
+        return `
+            <a href="${genreUrl}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="genre-item"
+               data-genre-id="${genre.id}">
+                ${genreName}
+            </a>
+        `;
+    }).join('');
+}
+
+function toggleAccordion() {
+    const content = document.getElementById('accordion-content');
+    const icon = document.getElementById('accordion-icon');
+    content.classList.toggle('open');
+    icon.classList.toggle('open');
+}
+
+// 年齢確認機能
+async function checkAgeVerification() {
+    const isVerified = localStorage.getItem('ageVerified') === 'true';
+    if (isVerified) {
+        document.getElementById('age-verification-overlay').classList.add('hidden');
+        document.getElementById('main-content').classList.add('visible');
+        await loadAllContent();
+    }
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    const storedLang = localStorage.getItem('preferredLanguage');
+    currentLang = urlLang || storedLang || 'ja';
+    
+    if (urlLang) {
+        localStorage.setItem('preferredLanguage', urlLang);
+    }
+    
+    updateUILanguage(currentLang);
+    generateGenreList();
+    
+    // 言語切り替えボタン
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-lang') === currentLang) {
+            btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.remove('active');
             });
-            return filtered.slice(0, count);
-        }
-
-        async function loadGenreRanking(genreId, containerId, count = 10) {
-            try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=genre&article_id=${genreId}&sort=rank&hits=50&output=json`;
-                
-                const data = await fetchWithProxy(apiUrl);
-                
-                if (data.result && data.result.items && data.result.items.length > 0) {
-                    const products = filterValidProducts(data.result.items, count);
-                    displayProducts(containerId, products, true);
-                } else {
-                    showError(containerId, 'コンテンツが見つかりません');
-                }
-            } catch (error) {
-                console.error(`Error loading genre ${genreId}:`, error);
-                showError(containerId, 'エラーが発生しました');
-            }
-        }
-
-        async function loadFloorRanking(floorCode, containerId, sort = 'rank', count = 10, site = 'FANZA') {
-            try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=${site}&service=digital&floor=${floorCode}&sort=${sort}&hits=50&output=json`;
-                
-                const data = await fetchWithProxy(apiUrl);
-                
-                if (data.result && data.result.items && data.result.items.length > 0) {
-                    const products = filterValidProducts(data.result.items, count);
-                    displayProducts(containerId, products, true);
-                } else {
-                    showError(containerId, 'コンテンツが見つかりません');
-                }
-            } catch (error) {
-                console.error(`Error loading floor ${floorCode}:`, error);
-                showError(containerId, 'エラーが発生しました');
-            }
-        }
-
-        async function searchActressId(actressName) {
-            try {
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ActressSearch?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&keyword=${encodeURIComponent(actressName)}&hits=1&output=json`;
-                
-                const data = await fetchWithProxy(apiUrl);
-                
-                if (data.result && data.result.actress && data.result.actress.length > 0) {
-                    return data.result.actress[0].id;
-                }
-                return null;
-            } catch (error) {
-                console.error(`Error searching actress ${actressName}:`, error);
-                return null;
-            }
-        }
-
-        async function loadActressWorksByName(actressName, containerId, count = 6) {
-            try {
-                const actressId = await searchActressId(actressName);
-                
-                if (!actressId) {
-                    showError(containerId, `女優 "${actressName}" が見つかりません`);
-                    return;
-                }
-                
-                const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&article=actress&article_id=${actressId}&sort=review&hits=50&output=json`;
-                
-                const data = await fetchWithProxy(apiUrl);
-                
-                if (data.result && data.result.items && data.result.items.length > 0) {
-                    const products = filterValidProducts(data.result.items, count);
-                    displayProducts(containerId, products, false);
-                } else {
-                    showError(containerId, 'コンテンツが見つかりません');
-                }
-            } catch (error) {
-                console.error(`Error loading works for ${actressName}:`, error);
-                showError(containerId, 'エラーが発生しました');
-            }
-        }
-
-        function displayProducts(containerId, products, showRank) {
-            const container = document.getElementById(containerId);
-            const t = translations[currentLang];
+            this.classList.add('active');
             
-            if (!container) {
-                console.error(`Container ${containerId} not found!`);
-                return;
-            }
-            
-            if (!products || products.length === 0) {
-                container.innerHTML = `<p class="loading">コンテンツが見つかりません</p>`;
-                return;
-            }
-            
-            container.innerHTML = products.map((item, index) => {
-                const imageUrl = item.imageURL.large || item.imageURL.small;
-                const affiliateUrl = item.affiliateURL || item.URL || '#';
-                const title = (item.title || 'Unknown').replace(/"/g, '&quot;');
-                const rankBadge = showRank ? `<div class="rank-badge">${index + 1}</div>` : '';
-                
-                return `
-                    <div class="product">
-                        <div class="product-image-wrapper">
-                            ${rankBadge}
-                            <img src="${imageUrl}" 
-                                 alt="${title}" 
-                                 class="product-image"
-                                 loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <div class="product-title">${item.title || 'Unknown'}</div>
-                            <a href="${affiliateUrl}" 
-                               class="product-link" 
-                               target="_blank" 
-                               rel="noopener noreferrer">
-                                ${t.viewDetails}
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function showError(containerId, message) {
-            document.getElementById(containerId).innerHTML = 
-                `<p class="loading">${message}</p>`;
-        }
-
-        // 初期化
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlLang = urlParams.get('lang');
-            const storedLang = localStorage.getItem('preferredLanguage');
-            currentLang = urlLang || storedLang || 'ja';
-            
-            if (urlLang) {
-                localStorage.setItem('preferredLanguage', urlLang);
-            }
-            
-            updateUILanguage(currentLang);
-            generateGenreList();
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('data-lang') === currentLang) {
-                    btn.classList.add('active');
-                }
-                
-                btn.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    
-                    document.querySelectorAll('.lang-btn').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    updateUILanguage(lang);
-                    generateGenreList();
-                    localStorage.setItem('preferredLanguage', lang);
-                });
-            });
-            
-            // 注: API呼び出しはcheckAgeVerification()とloadAllContent()で処理される
+            updateUILanguage(lang);
+            localStorage.setItem('preferredLanguage', lang);
         });
-    </script>
+    });
+    
+    checkAgeVerification();
+});
+
+// 18歳以上ボタン
+const btnEnter = document.getElementById('btn-enter');
+if (btnEnter) {
+    btnEnter.addEventListener('click', async function() {
+        localStorage.setItem('ageVerified', 'true');
+        document.getElementById('age-verification-overlay').classList.add('hidden');
+        document.getElementById('main-content').classList.add('visible');
+        await loadAllContent();
+    });
+}
+</script>
     </div><!-- #main-content -->
 </body>
 </html>
