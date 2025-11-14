@@ -112,6 +112,14 @@ def fetch_latest_videos():
             print(f"🔍 Debug - API_ID length: {len(FANZA_API_ID) if FANZA_API_ID else 0}")
             print(f"🔍 Debug - AFFILIATE_ID length: {len(FANZA_AFFILIATE_ID) if FANZA_AFFILIATE_ID else 0}")
             
+            if FANZA_API_ID:
+                print(f"🔍 Debug - API_ID first 5: {FANZA_API_ID[:5]}")
+                print(f"🔍 Debug - API_ID last 5: {FANZA_API_ID[-5:]}")
+            
+            if FANZA_AFFILIATE_ID:
+                print(f"🔍 Debug - AFFILIATE_ID first 5: {FANZA_AFFILIATE_ID[:5]}")
+                print(f"🔍 Debug - AFFILIATE_ID last 3: {FANZA_AFFILIATE_ID[-3:]}")
+            
             if not FANZA_API_ID or not FANZA_AFFILIATE_ID:
                 print("❌ Missing API credentials!")
                 return None
