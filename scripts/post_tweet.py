@@ -100,34 +100,34 @@ def get_current_post_index():
         # 手動実行の場合はランダム
         return random.randint(0, 4)
 
-def fetch_latest_video(offset=1):
-    """FANZA APIから新着動画を1件だけ取得（高速化）"""
+def fetch_latest_videos():
+    """FANZA APIから新着作品を5件取得"""
     try:
-        # offset: 1=1つ目, 2=2つ目, 3=3つ目...
-        api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=1&offset={offset}&output=json'
+        # 5件まとめて取得（直接API呼び出しなら速い）
+        api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&offset=1&output=json'
         
-        print(f"🔄 Fetching video #{offset} from FANZA API...")
+        print(f"🔄 Fetching 5 latest items from FANZA API...")
         response = requests.get(api_url, timeout=10)
         response.raise_for_status()
         
         data = response.json()
         
-        if data.get('result') and data['result'].get('items') and len(data['result']['items']) > 0:
-            video = data['result']['items'][0]
-            print(f"✅ Success! Fetched video: {video.get('title', 'Unknown')[:30]}...")
-            return video
+        if data.get('result') and data['result'].get('items'):
+            items = data['result']['items']
+            print(f"✅ Success! Fetched {len(items)} items")
+            return items
         else:
             print("⚠️ No items in response")
             return None
                 
     except Exception as e:
-        print(f"❌ Error fetching video: {e}")
+        print(f"❌ Error fetching items: {e}")
         return None
 
-def generate_tweet(video, post_index):
+def generate_tweet(item, post_index):
     """ツイートを生成"""
     # タイトルを伏字化
-    title = video.get('title', '新作動画')
+    title = item.get('title', '新作')
     censored_title = censor_text(title)
     
     # タイトルが長すぎる場合は省略
@@ -168,17 +168,17 @@ def post_tweet():
     try:
         # 投稿インデックスを判定（0-4）
         post_index = get_current_post_index()
-        print(f"📍 Posting video index: {post_index}")
+        print(f"📍 Posting item index: {post_index}")
         
-        # 必要な1件だけ取得（offset = post_index + 1）
-        video = fetch_latest_video(offset=post_index + 1)
+        # 新着5件を取得
+        items = fetch_latest_videos()
         
-        if not video:
-            print("⚠️ No video available, using fallback tweet")
-            # フォールバック用のツイート（ハッシュタグなし + 時刻追加）
+        if not items or len(items) <= post_index:
+            print(f"⚠️ Not enough items (need {post_index + 1}, got {len(items) if items else 0}), using fallback tweet")
+            # フォールバック用のツイート
             now = datetime.now()
             time_str = now.strftime('%H:%M')
-            tweet_text = f"""🔥 本日の人気動画をチェック
+            tweet_text = f"""🔥 本日の人気作品をチェック
 
 熟女・人妻・中〇し・巨〇など
 人気ジャンルのランキングを毎日更新中
@@ -186,7 +186,10 @@ def post_tweet():
 今すぐ無料で視聴 ({time_str})
 {SITE_URL}"""
         else:
-            tweet_text = generate_tweet(video, post_index)
+            # 該当インデックスの作品を取得
+            item = items[post_index]
+            print(f"📹 Selected: {item.get('title', 'Unknown')[:40]}...")
+            tweet_text = generate_tweet(item, post_index)
         
         # Tweepy v2 Client
         client = tweepy.Client(
