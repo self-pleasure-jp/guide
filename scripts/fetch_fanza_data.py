@@ -13,7 +13,7 @@ import time
 
 # FANZA API設定
 API_ID = 'a2BXCsL2MVUtUeuFBZ1h'
-AFFILIATE_ID = 'yoru365-002'
+AFFILIATE_ID = 'yoru365-990'
 
 def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa'):
     """FANZA APIからデータを取得"""
