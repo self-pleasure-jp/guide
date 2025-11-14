@@ -1029,7 +1029,40 @@
         }
 
         // 複数プロキシを試す関数
-        async function fetchWithProxy(apiUrl, timeout = 15000) {
+        async function fetchWithProxy(apiUrl, timeout = 60000) {
+            const proxies = [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://proxy.cors.sh/',
+                'https://thingproxy.freeboard.io/fetch/'
+            ];
+
+            let lastError = null;
+
+            for (const proxyUrl of proxies) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                    const response = await fetch(proxyUrl + encodeURIComponent(apiUrl), {
+                        method: 'GET',
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                } catch (error) {
+                    lastError = error;
+                    console.log(`Proxy ${proxyUrl} failed, trying next...`);
+                    continue;
+                }
+            }
+    
+            throw lastError || new Error('All proxies failed');
+        }
             const proxies = [
                 'https://api.allorigins.win/raw?url=',
                 'https://corsproxy.io/?',
@@ -1231,6 +1264,7 @@
                 });
             });
             
+            // 注: API呼び出しはcheckAgeVerification()とloadAllContent()で処理される
         });
     </script>
     </div><!-- #main-content -->
