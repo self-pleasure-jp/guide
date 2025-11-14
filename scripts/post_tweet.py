@@ -86,19 +86,21 @@ def get_current_post_index():
     minute = now.minute
     
     # UTC時間で判定（JSTから-9時間）
-    if hour == 10 and minute >= 16:  # 19:16 JST
+    if hour == 9 and minute >= 0:   # 18:00 JST
         return 0
-    elif hour == 11 and minute >= 46:  # 20:46 JST
+    elif hour == 10 and minute >= 16:  # 19:16 JST
         return 1
-    elif hour == 12 and minute >= 36:  # 21:36 JST
+    elif hour == 11 and minute >= 46:  # 20:46 JST
         return 2
-    elif hour == 13 and minute >= 26:  # 22:26 JST
+    elif hour == 12 and minute >= 36:  # 21:36 JST
         return 3
-    elif hour == 14 and minute >= 6:  # 23:06 JST
+    elif hour == 13 and minute >= 26:  # 22:26 JST
         return 4
+    elif hour == 14 and minute >= 6:  # 23:06 JST
+        return 5
     else:
         # 手動実行の場合はランダム
-        return random.randint(0, 4)
+        return random.randint(0, 5)
 
 def fetch_latest_videos():
     """FANZA APIから新着作品を5件取得（リトライ付き）"""
@@ -114,10 +116,10 @@ def fetch_latest_videos():
                 print("❌ Missing API credentials!")
                 return None
             
-            # 5件まとめて取得（タイムアウト30秒）
-            api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&offset=1&output=json'
+            # 6件まとめて取得（タイムアウト30秒）
+            api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=6&offset=1&output=json'
             
-            print(f"🔄 Fetching 5 latest items from FANZA API... (attempt {attempt + 1}/{max_retries})")
+            print(f"🔄 Fetching 6 latest items from FANZA API... (attempt {attempt + 1}/{max_retries})")
             
             # タイムアウトを30秒に延長
             response = requests.get(api_url, timeout=30)
