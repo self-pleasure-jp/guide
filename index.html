@@ -585,35 +585,13 @@
         </div>
     </div>
 
-    <script>
-        // 年齢確認機能
-        function checkAgeVerification() {
-            const isVerified = localStorage.getItem('ageVerified') === 'true';
-            if (isVerified) {
-                document.getElementById('age-verification-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                loadAllContent();
-            }
-        }
-
-        // ページ読み込み時に年齢確認をチェック
-        checkAgeVerification();
-
-        // 18歳以上ボタンのイベント
-        const btnEnter = document.getElementById('btn-enter');
-        if (btnEnter) {
-            btnEnter.addEventListener('click', function() {
-                localStorage.setItem('ageVerified', 'true');
-                document.getElementById('age-verification-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                loadAllContent();
-            });
-        }
-        
+<script>
+        // 定数を最初に定義
         const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
         const AFFILIATE_ID = 'yoru365-002';
         let currentLang = 'ja';
         
+        // 全データをロードする関数
         function loadAllContent() {
             loadGenreRanking(5001, 'creampie-ranking', 10);
             loadGenreRanking(2001, 'bigbreasts-ranking', 10);
@@ -626,7 +604,31 @@
             loadActressWorksByName('弥生みづき', 'actress-1050071', 6);
             loadActressWorksByName('逢沢みゆ', 'actress-1107799', 6);
         }
-
+        
+        // 年齢確認機能
+        function checkAgeVerification() {
+            const isVerified = localStorage.getItem('ageVerified') === 'true';
+            if (isVerified) {
+                document.getElementById('age-verification-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+                loadAllContent();
+            }
+        }
+        
+        // ページ読み込み時に年齢確認をチェック
+        checkAgeVerification();
+        
+        // 18歳以上ボタンのイベント
+        const btnEnter = document.getElementById('btn-enter');
+        if (btnEnter) {
+            btnEnter.addEventListener('click', function() {
+                localStorage.setItem('ageVerified', 'true');
+                document.getElementById('age-verification-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+                loadAllContent();
+            });
+        }
+        
         // アコーディオントグル
         function toggleAccordion() {
             const content = document.getElementById('accordion-content');
@@ -634,7 +636,7 @@
             content.classList.toggle('open');
             icon.classList.toggle('open');
         }
-
+        
         // キーワード設定
         const KEYWORDS = [
             { text: { ja: '熟女', en: 'MILF', es: 'Mujer Madura' }, affiliateUrl: 'https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Flitevideo%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D1014%2Fsort%3Ddate%2F&af_id=yoru365-002&ch=link_tool&ch_id=link' },
