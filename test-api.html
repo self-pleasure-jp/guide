@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FANZA API Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00ff00;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .result {
+            background: #000;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .item {
+            background: #111;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .item h3 {
+            color: #ffffff;
+            margin-top: 0;
+        }
+        .item a {
+            color: #00aaff;
+            text-decoration: none;
+        }
+        .item a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .error {
+            color: #ff3366;
+            border-left-color: #ff3366;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .info {
+            color: #00aaff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 FANZA API Test Page</h1>
+    
+    <div class="test-section">
+        <h2>📊 Test 1: Ranking API (sort=rank)</h2>
+        <button onclick="testRankingAPI()">Test Ranking API</button>
+        <div id="ranking-result" class="result"></div>
+        <div id="ranking-items"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📅 Test 2: Latest API (sort=date)</h2>
+        <button onclick="testLatestAPI()">Test Latest API</button>
+        <div id="latest-result" class="result"></div>
+        <div id="latest-items"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test 3: Direct API Call (No Proxy)</h2>
+        <button onclick="testDirectAPI()">Test Direct API</button>
+        <div id="direct-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_ID = 'a2BXCsL2MVUtUeuFBZ1h';
+        const AFFILIATE_ID = 'yoru365-002';
+
+        function log(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            el.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        }
+
+        function displayItems(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                    <h3>${index + 1}. ${item.title || 'No Title'}</h3>
+                    <p><strong>Content ID:</strong> ${item.content_id}</p>
+                    <p><strong>Date:</strong> ${item.date || 'N/A'}</p>
+                    <p><strong>Price:</strong> ${item.prices?.price || 'N/A'}</p>
+                    <p><a href="${item.affiliateURL || '#'}" target="_blank">View on FANZA</a></p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function testRankingAPI() {
+            const resultId = 'ranking-result';
+            const itemsId = 'ranking-items';
+            document.getElementById(resultId).innerHTML = '';
+            document.getElementById(itemsId).innerHTML = '';
+            
+            log(resultId, '🔄 Testing Ranking API with CORS proxy...', 'info');
+            
+            const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&hits=6&offset=1&output=json`;
+            
+            log(resultId, `📝 API URL: ${apiUrl}`, 'info');
+            
+            const proxies = [
+                'https://api.allorigins.win/raw?url=',
+                'https://corsproxy.io/?',
+                'https://proxy.cors.sh/'
+            ];
+            
+            for (const proxy of proxies) {
+                try {
+                    log(resultId, `🔄 Trying proxy: ${proxy}`, 'info');
+                    
+                    const response = await fetch(proxy + encodeURIComponent(apiUrl));
+                    
+                    log(resultId, `📊 Response status: ${response.status}`, 
+                        response.ok ? 'success' : 'error');
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        log(resultId, `✅ Success! Got ${data.result?.result_count || 0} items`, 'success');
+                        log(resultId, `📦 Total available: ${data.result?.total_count || 0}`, 'info');
+                        
+                        if (data.result?.items) {
+                            displayItems(itemsId, data.result.items);
+                            
+                            // タイトル一覧を表示
+                            const titles = data.result.items.map((item, i) => 
+                                `${i + 1}. ${item.title}`
+                            ).join('\n');
+                            log(resultId, `\n📝 Titles:\n${titles}`, 'success');
+                        }
+                        
+                        return;
+                    }
+                } catch (error) {
+                    log(resultId, `❌ Proxy failed: ${error.message}`, 'error');
+                }
+            }
+            
+            log(resultId, '❌ All proxies failed', 'error');
+        }
+
+        async function testLatestAPI() {
+            const resultId = 'latest-result';
+            const itemsId = 'latest-items';
+            document.getElementById(resultId).innerHTML = '';
+            document.getElementById(itemsId).innerHTML = '';
+            
+            log(resultId, '🔄 Testing Latest API (sort=date)...', 'info');
+            
+            const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=6&offset=1&output=json`;
+            
+            log(resultId, `📝 API URL: ${apiUrl}`, 'info');
+            
+            const proxy = 'https://api.allorigins.win/raw?url=';
+            
+            try {
+                const response = await fetch(proxy + encodeURIComponent(apiUrl));
+                
+                log(resultId, `📊 Response status: ${response.status}`, 
+                    response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    log(resultId, `✅ Success! Got ${data.result?.result_count || 0} items`, 'success');
+                    
+                    if (data.result?.items) {
+                        displayItems(itemsId, data.result.items);
+                        
+                        const titles = data.result.items.map((item, i) => 
+                            `${i + 1}. ${item.title}`
+                        ).join('\n');
+                        log(resultId, `\n📝 Titles:\n${titles}`, 'success');
+                    }
+                }
+            } catch (error) {
+                log(resultId, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDirectAPI() {
+            const resultId = 'direct-result';
+            document.getElementById(resultId).innerHTML = '';
+            
+            log(resultId, '🔄 Testing Direct API call (will likely fail due to CORS)...', 'info');
+            
+            const apiUrl = `https://api.dmm.com/affiliate/v3/ItemList?api_id=${API_ID}&affiliate_id=${AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=rank&hits=6&offset=1&output=json`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                log(resultId, `📊 Response status: ${response.status}`, 'success');
+                const data = await response.json();
+                log(resultId, `✅ Success: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                log(resultId, `❌ Expected CORS error: ${error.message}`, 'error');
+                log(resultId, '💡 This is why we need a proxy for browser calls', 'info');
+            }
+        }
+
+        // 自動テスト
+        window.addEventListener('load', () => {
+            console.log('🚀 Page loaded. Click buttons to test API calls.');
+        });
+    </script>
+</body>
+</html>
