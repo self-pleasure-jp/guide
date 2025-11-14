@@ -38,7 +38,7 @@ def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa'):
     for attempt in range(max_retries):
         try:
             print(f"🔄 Fetching {sort} data (attempt {attempt + 1}/{max_retries})...")
-            response = requests.get(base_url, params=params, timeout=30)
+            response = requests.get(base_url, params=params, timeout=600)
             
             print(f"📊 Response status: {response.status_code}")
             
