@@ -101,40 +101,68 @@ def get_current_post_index():
         return random.randint(0, 4)
 
 def fetch_latest_videos():
-    """FANZA APIから新着作品を5件取得"""
-    try:
-        # デバッグ: API認証情報の確認
-        print(f"🔍 Debug - API_ID length: {len(FANZA_API_ID) if FANZA_API_ID else 0}")
-        print(f"🔍 Debug - AFFILIATE_ID length: {len(FANZA_AFFILIATE_ID) if FANZA_AFFILIATE_ID else 0}")
-        
-        if not FANZA_API_ID or not FANZA_AFFILIATE_ID:
-            print("❌ Missing API credentials!")
-            return None
-        
-        # 5件まとめて取得（直接API呼び出しなら速い）
-        api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&offset=1&output=json'
-        
-        print(f"🔄 Fetching 5 latest items from FANZA API...")
-        response = requests.get(api_url, timeout=10)
-        
-        print(f"📊 Response status: {response.status_code}")
-        
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        if data.get('result') and data['result'].get('items'):
-            items = data['result']['items']
-            print(f"✅ Success! Fetched {len(items)} items")
-            return items
-        else:
-            print("⚠️ No items in response")
-            print(f"📄 Response: {data}")
-            return None
+    """FANZA APIから新着作品を5件取得（リトライ付き）"""
+    max_retries = 3
+    
+    for attempt in range(max_retries):
+        try:
+            # デバッグ: API認証情報の確認
+            print(f"🔍 Debug - API_ID length: {len(FANZA_API_ID) if FANZA_API_ID else 0}")
+            print(f"🔍 Debug - AFFILIATE_ID length: {len(FANZA_AFFILIATE_ID) if FANZA_AFFILIATE_ID else 0}")
+            
+            if not FANZA_API_ID or not FANZA_AFFILIATE_ID:
+                print("❌ Missing API credentials!")
+                return None
+            
+            # 5件まとめて取得（タイムアウト30秒）
+            api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&offset=1&output=json'
+            
+            print(f"🔄 Fetching 5 latest items from FANZA API... (attempt {attempt + 1}/{max_retries})")
+            
+            # タイムアウトを30秒に延長
+            response = requests.get(api_url, timeout=30)
+            
+            print(f"📊 Response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-    except Exception as e:
-        print(f"❌ Error fetching items: {e}")
-        return None
+                if data.get('result') and data['result'].get('items'):
+                    items = data['result']['items']
+                    print(f"✅ Success! Fetched {len(items)} items")
+                    return items
+                else:
+                    print("⚠️ No items in response")
+                    print(f"📄 Response: {data}")
+                    return None
+            else:
+                print(f"⚠️ Status {response.status_code}, retrying...")
+                if attempt < max_retries - 1:
+                    import time
+                    time.sleep(5)  # 5秒待機
+                    continue
+                else:
+                    response.raise_for_status()
+                    
+        except requests.exceptions.Timeout:
+            print(f"⏱️ Timeout on attempt {attempt + 1}")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(5)
+                continue
+            else:
+                print("❌ All retry attempts failed due to timeout")
+                return None
+        except Exception as e:
+            print(f"❌ Error fetching items: {e}")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(5)
+                continue
+            else:
+                return None
+    
+    return None
 
 def generate_tweet(item, post_index):
     """ツイートを生成"""
