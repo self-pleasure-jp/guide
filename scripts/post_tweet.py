@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA自動投稿Bot - 新着作品対応版
-新着作品タイトルを取得して伏字化してXに投稿
+FANZA自動投稿Bot - JSON読み込み版
+data/fanza_data.jsonから作品情報を読み込んで伏字化してXに投稿
 """
 
 import os
 import random
-import requests
+import json
 from datetime import datetime
 import tweepy
 
@@ -16,10 +16,6 @@ API_KEY = os.environ.get('TWITTER_API_KEY')
 API_SECRET = os.environ.get('TWITTER_API_SECRET')
 ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
-
-# FANZA API設定（テスト用に直接設定）
-FANZA_API_ID = 'a2BXCsL2MVUtUeuFBZ1h'
-FANZA_AFFILIATE_ID = 'yoru365-002'
 
 # サイトURL
 SITE_URL = 'https://self-pleasure-jp.github.io/guide/'
@@ -48,25 +44,19 @@ CENSOR_PATTERNS = {
     '素人': ['〇人', '素〇', 'シロ〇ト'],
     'OL': ['〇L', 'O〇', 'オーエ〇'],
     'JK': ['〇K', 'J〇', 'ジェー〇'],
-    '女子校生': ['〇子校生', '女〇校生', '女子〇生'],
-    '学生': ['〇生', '学〇', 'ガク〇'],
-    '制服': ['〇服', '制〇', 'セイ〇ク'],
-    'パイズリ': ['パ〇ズリ', 'パイ〇リ', '〇イズリ'],
-    'クンニ': ['ク〇ニ', 'クン〇', '〇ンニ'],
-    '手コキ': ['〇コキ', '手〇キ', 'テ〇キ'],
-    '足コキ': ['〇コキ', '足〇キ', 'アシ〇キ'],
-    'イキ': ['イ〇', '〇キ'],
-    '絶頂': ['〇頂', '絶〇', 'ゼッ〇ウ'],
-    '快楽': ['〇楽', '快〇', 'カイ〇ク'],
-    '禁欲': ['〇欲', '禁〇', 'キン〇ク'],
-    '爆乳': ['〇乳', '爆〇', 'バク〇ュウ'],
-    '美少女': ['〇少女', '美〇女', 'ビショ〇ジョ'],
-    '美乳': ['〇乳', '美〇', 'ビ〇ュウ'],
-    '巨根': ['〇根', '巨〇', 'キョ〇ン'],
-    '淫乱': ['〇乱', '淫〇', 'イン〇ン'],
-    '痴漢': ['〇漢', '痴〇', 'チ〇ン'],
-    '調教': ['〇教', '調〇', 'チョー〇ョウ'],
-    '奴隷': ['〇隷', '奴〇', 'ド〇イ']
+    '女子校生': ['女〇校生', 'J〇', '学〇'],
+    '爆乳': ['〇乳', '爆〇', 'バク〇'],
+    '美少女': ['美〇女', '〇少女', 'ビショ〇'],
+    '美乳': ['〇乳', '美〇', 'ビニュ〇'],
+    'パイパン': ['パイ〇', '〇パン', 'ツル〇'],
+    'バイブ': ['バ〇ブ', 'バイ〇', '〇イブ'],
+    'ぶっかけ': ['ぶっ〇け', '〇っかけ', 'ブッ〇'],
+    'フェラチオ': ['フェ〇', 'フ〇チオ', '〇ェラ'],
+    'ベロチュー': ['ベロ〇', '〇チュー', 'ベ〇チュー'],
+    '放尿': ['〇尿', '放〇', 'ホウ〇'],
+    '母乳': ['〇乳', '母〇', 'ボニ〇'],
+    'ローター': ['ロー〇', '〇ーター', 'ロ〇タ'],
+    '輪姦': ['〇姦', '輪〇', 'リン〇']
 }
 
 def censor_text(text):
@@ -74,7 +64,6 @@ def censor_text(text):
     censored = text
     for original, patterns in CENSOR_PATTERNS.items():
         if original in censored:
-            # ランダムに伏字パターンを選択
             replacement = random.choice(patterns)
             censored = censored.replace(original, replacement)
     return censored
@@ -102,146 +91,100 @@ def get_current_post_index():
         # 手動実行の場合はランダム
         return random.randint(0, 5)
 
-def fetch_latest_videos():
-    """FANZA APIから新着作品を5件取得（リトライ付き）"""
-    max_retries = 3
-    
-    for attempt in range(max_retries):
-        try:
-            # デバッグ: API認証情報の確認
-            print(f"🔍 Debug - API_ID length: {len(FANZA_API_ID) if FANZA_API_ID else 0}")
-            print(f"🔍 Debug - AFFILIATE_ID length: {len(FANZA_AFFILIATE_ID) if FANZA_AFFILIATE_ID else 0}")
-            
-            if FANZA_API_ID:
-                print(f"🔍 Debug - API_ID first 5: {FANZA_API_ID[:5]}")
-                print(f"🔍 Debug - API_ID last 5: {FANZA_API_ID[-5:]}")
-            
-            if FANZA_AFFILIATE_ID:
-                print(f"🔍 Debug - AFFILIATE_ID first 5: {FANZA_AFFILIATE_ID[:5]}")
-                print(f"🔍 Debug - AFFILIATE_ID last 3: {FANZA_AFFILIATE_ID[-3:]}")
-            
-            if not FANZA_API_ID or not FANZA_AFFILIATE_ID:
-                print("❌ Missing API credentials!")
-                return None
-            
-            # 6件まとめて取得（タイムアウト30秒）
-            api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=6&offset=1&output=json'
-            
-            print(f"🔄 Fetching 6 latest items from FANZA API... (attempt {attempt + 1}/{max_retries})")
-            
-            # タイムアウトを30秒に延長
-            response = requests.get(api_url, timeout=30)
-            
-            print(f"📊 Response status: {response.status_code}")
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                if data.get('result') and data['result'].get('items'):
-                    items = data['result']['items']
-                    print(f"✅ Success! Fetched {len(items)} items")
-                    return items
-                else:
-                    print("⚠️ No items in response")
-                    print(f"📄 Response: {data}")
-                    return None
-            else:
-                print(f"⚠️ Status {response.status_code}, retrying...")
-                if attempt < max_retries - 1:
-                    import time
-                    time.sleep(5)  # 5秒待機
-                    continue
-                else:
-                    response.raise_for_status()
-                    
-        except requests.exceptions.Timeout:
-            print(f"⏱️ Timeout on attempt {attempt + 1}")
-            if attempt < max_retries - 1:
-                import time
-                time.sleep(5)
-                continue
-            else:
-                print("❌ All retry attempts failed due to timeout")
-                return None
-        except Exception as e:
-            print(f"❌ Error fetching items: {e}")
-            if attempt < max_retries - 1:
-                import time
-                time.sleep(5)
-                continue
-            else:
-                return None
-    
-    return None
+def load_fanza_data():
+    """JSONファイルからFANZAデータを読み込み"""
+    try:
+        json_path = 'data/fanza_data.json'
+        
+        print(f"📂 Loading data from {json_path}...")
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        print(f"✅ Data loaded successfully!")
+        print(f"📅 Updated at: {data.get('updated_at', 'Unknown')}")
+        
+        # 全ての作品をリストに集める
+        all_items = []
+        
+        # ランキングから
+        for category, items in data.get('rankings', {}).items():
+            all_items.extend(items)
+        
+        # フロアから
+        for floor, items in data.get('floors', {}).items():
+            all_items.extend(items)
+        
+        # 女優から
+        for actress, items in data.get('actresses', {}).items():
+            all_items.extend(items)
+        
+        print(f"📦 Total items loaded: {len(all_items)}")
+        
+        return all_items
+        
+    except FileNotFoundError:
+        print(f"❌ Error: {json_path} not found!")
+        return []
+    except json.JSONDecodeError as e:
+        print(f"❌ Error decoding JSON: {str(e)}")
+        return []
+    except Exception as e:
+        print(f"❌ Error loading data: {str(e)}")
+        return []
 
-def generate_tweet(item, post_index):
-    """ツイートを生成"""
-    # タイトルを伏字化
-    title = item.get('title', '新作')
+def create_tweet_text(item, post_index):
+    """ツイート文を作成"""
+    if not item or not item.get('title'):
+        return create_fallback_tweet()
+    
+    title = item.get('title', 'タイトル不明')
     censored_title = censor_text(title)
     
-    # タイトルが長すぎる場合は省略
-    if len(censored_title) > 40:
-        censored_title = censored_title[:37] + '...'
+    # URLを取得
+    affiliate_url = item.get('affiliateURL', SITE_URL)
     
-    # ジャンルをランダムに選択して伏字化
-    genres = ['中出し', '巨乳', '痴女', '人妻', '熟女', '美少女', '素人']
-    selected_genres = random.sample(genres, 3)
-    censored_genres = [censor_text(g) for g in selected_genres]
-    genres_text = '・'.join(censored_genres)
-    
-    # 女優名リスト
-    actresses = ['松本いちか', '美園和花', '沙月恵奈', '弥生みづき', '逢沢みゆ']
-    random_actress = random.choice(actresses)
-    
-    # 現在時刻（重複防止）
+    # 現在時刻を取得
     now = datetime.now()
     time_str = now.strftime('%H:%M')
     
-    # ツイート生成（ハッシュタグなし）
-    tweet = f"""🆕 新着作品 #{post_index + 1}
-「{censored_title}」
-
-🔥 今日のおすすめジャンル
-{genres_text}
-
-👑 注目の女優さん
-{random_actress}
-
-🎬 詳しくはこちら ({time_str})
-{SITE_URL}"""
+    # ツイートテンプレート
+    templates = [
+        f"🔥 新着作品\n\n{censored_title}\n\n👉 詳細はこちら\n{SITE_URL}\n\n#{random.choice(['FANZA', '成人向け', 'アダルト動画'])} ({time_str})",
+        f"✨ 本日の注目作\n\n{censored_title}\n\n今すぐチェック ({time_str})\n{SITE_URL}",
+        f"💕 人気上昇中\n\n{censored_title}\n\nサンプル動画あり\n{SITE_URL}\n\n({time_str})",
+        f"🎬 {censored_title}\n\n詳細・サンプル動画 ({time_str})\n{SITE_URL}",
+        f"🌟 話題の作品\n\n{censored_title}\n\n今すぐ視聴 ({time_str})\n{SITE_URL}"
+    ]
+    
+    tweet = random.choice(templates)
+    
+    # 280文字制限チェック
+    if len(tweet) > 280:
+        # 長すぎる場合はタイトルを短縮
+        max_title_length = 280 - len(tweet) + len(censored_title) - 10
+        censored_title = censored_title[:max_title_length] + '...'
+        tweet = random.choice(templates)
     
     return tweet
 
-def post_tweet():
-    """Xに投稿"""
+def create_fallback_tweet():
+    """フォールバックツイート（データが取得できない場合）"""
+    now = datetime.now()
+    time_str = now.strftime('%H:%M')
+    
+    templates = [
+        f"🔥 本日の人気作品をチェック\n\n熟〇・人〇・中〇し・巨〇など\n人気ジャンルのランキングを毎日更新中\n\n今すぐ無料で視聴 ({time_str})\n{SITE_URL}",
+        f"💕 毎日更新！人気ランキング\n\n中〇し・巨〇・熟〇など\n今日の新着作品をチェック\n\n無料サンプルあり ({time_str})\n{SITE_URL}",
+        f"✨ あなた好みの作品がきっと見つかる\n\n人気ジャンル別ランキング\n毎日更新中！\n\n今すぐチェック ({time_str})\n{SITE_URL}"
+    ]
+    
+    return random.choice(templates)
+
+def post_tweet(tweet_text):
+    """ツイートを投稿"""
     try:
-        # 投稿インデックスを判定（0-4）
-        post_index = get_current_post_index()
-        print(f"📍 Posting item index: {post_index}")
-        
-        # 新着5件を取得
-        items = fetch_latest_videos()
-        
-        if not items or len(items) <= post_index:
-            print(f"⚠️ Not enough items (need {post_index + 1}, got {len(items) if items else 0}), using fallback tweet")
-            # フォールバック用のツイート
-            now = datetime.now()
-            time_str = now.strftime('%H:%M')
-            tweet_text = f"""🔥 本日の人気作品をチェック
-
-熟女・人妻・中〇し・巨〇など
-人気ジャンルのランキングを毎日更新中
-
-今すぐ無料で視聴 ({time_str})
-{SITE_URL}"""
-        else:
-            # 該当インデックスの作品を取得
-            item = items[post_index]
-            print(f"📹 Selected: {item.get('title', 'Unknown')[:40]}...")
-            tweet_text = generate_tweet(item, post_index)
-        
-        # Tweepy v2 Client
+        # Twitter API v2 クライアントを作成
         client = tweepy.Client(
             consumer_key=API_KEY,
             consumer_secret=API_SECRET,
@@ -249,37 +192,49 @@ def post_tweet():
             access_token_secret=ACCESS_TOKEN_SECRET
         )
         
-        # ツイート投稿
+        # ツイートを投稿
         response = client.create_tweet(text=tweet_text)
-        print(f"✅ Tweet posted successfully")
-        print(f"📝 Tweet ID: {response.data['id']}")
-        print(f"📄 Tweet preview:")
-        print(tweet_text)
         
-        return True
+        return response.data['id']
         
     except Exception as e:
-        print(f"❌ Error posting tweet: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
+        print(f"❌ Error posting tweet: {str(e)}")
+        raise
 
 def main():
-    """メイン処理"""
     print(f"🚀 Starting FANZA auto-post bot at {datetime.now()}")
     
-    # 環境変数チェック
-    if not all([API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET]):
-        print("❌ Missing Twitter API credentials")
-        return
+    # 投稿するアイテムのインデックスを決定
+    post_index = get_current_post_index()
+    print(f"📍 Posting item index: {post_index}")
     
-    # ツイート投稿
-    success = post_tweet()
+    # JSONからデータを読み込み
+    items = load_fanza_data()
     
-    if success:
-        print(f"✅ Auto-post completed successfully")
+    if not items or len(items) == 0:
+        print("⚠️ No items loaded, using fallback tweet")
+        tweet_text = create_fallback_tweet()
+    elif len(items) <= post_index:
+        print(f"⚠️ Not enough items (need {post_index + 1}, got {len(items)}), using random item")
+        item = random.choice(items)
+        tweet_text = create_tweet_text(item, post_index)
     else:
-        print(f"❌ Auto-post failed")
+        # ランダムにアイテムを選択（多様性を確保）
+        item = random.choice(items)
+        tweet_text = create_tweet_text(item, post_index)
+    
+    # ツイートを投稿
+    try:
+        tweet_id = post_tweet(tweet_text)
+        print(f"✅ Tweet posted successfully")
+        print(f"📝 Tweet ID: {tweet_id}")
+        print(f"📄 Tweet preview:")
+        print(tweet_text)
+        print(f"✅ Auto-post completed successfully")
+        
+    except Exception as e:
+        print(f"❌ Failed to post tweet: {str(e)}")
+        exit(1)
 
 if __name__ == '__main__':
     main()
