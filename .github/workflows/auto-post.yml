@@ -14,7 +14,7 @@ on:
     # JST 23:06 (UTC 14:06) - 新着5つ目
     - cron: '06 14 * * *'
   
-  workflow_dispatch:  # 手動実行可能
+  workflow_dispatch:  # 手動実行が可能
 
 jobs:
   post-tweet:
