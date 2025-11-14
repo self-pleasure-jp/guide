@@ -103,11 +103,22 @@ def get_current_post_index():
 def fetch_latest_videos():
     """FANZA APIから新着作品を5件取得"""
     try:
+        # デバッグ: API認証情報の確認
+        print(f"🔍 Debug - API_ID length: {len(FANZA_API_ID) if FANZA_API_ID else 0}")
+        print(f"🔍 Debug - AFFILIATE_ID length: {len(FANZA_AFFILIATE_ID) if FANZA_AFFILIATE_ID else 0}")
+        
+        if not FANZA_API_ID or not FANZA_AFFILIATE_ID:
+            print("❌ Missing API credentials!")
+            return None
+        
         # 5件まとめて取得（直接API呼び出しなら速い）
         api_url = f'https://api.dmm.com/affiliate/v3/ItemList?api_id={FANZA_API_ID}&affiliate_id={FANZA_AFFILIATE_ID}&site=FANZA&service=digital&floor=videoa&sort=date&hits=5&offset=1&output=json'
         
         print(f"🔄 Fetching 5 latest items from FANZA API...")
         response = requests.get(api_url, timeout=10)
+        
+        print(f"📊 Response status: {response.status_code}")
+        
         response.raise_for_status()
         
         data = response.json()
@@ -118,6 +129,7 @@ def fetch_latest_videos():
             return items
         else:
             print("⚠️ No items in response")
+            print(f"📄 Response: {data}")
             return None
                 
     except Exception as e:
