@@ -606,26 +606,26 @@
         }
         
         // 年齢確認機能
-        function checkAgeVerification() {
+        async function checkAgeVerification() {
             const isVerified = localStorage.getItem('ageVerified') === 'true';
             if (isVerified) {
                 document.getElementById('age-verification-overlay').classList.add('hidden');
                 document.getElementById('main-content').classList.add('visible');
-                loadAllContent();
+                await loadAllContent();
             }
         }
-        
+
         // ページ読み込み時に年齢確認をチェック
         checkAgeVerification();
-        
+
         // 18歳以上ボタンのイベント
         const btnEnter = document.getElementById('btn-enter');
         if (btnEnter) {
-            btnEnter.addEventListener('click', function() {
+            btnEnter.addEventListener('click', async function() {
                 localStorage.setItem('ageVerified', 'true');
                 document.getElementById('age-verification-overlay').classList.add('hidden');
                 document.getElementById('main-content').classList.add('visible');
-                loadAllContent();
+                await loadAllContent();
             });
         }
         
