@@ -17,9 +17,9 @@ API_SECRET = os.environ.get('TWITTER_API_SECRET')
 ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
-# FANZA API設定
-FANZA_API_ID = os.environ.get('FANZA_API_ID', 'a2BXCsL2MVUtUeuFBZ1h')
-FANZA_AFFILIATE_ID = os.environ.get('FANZA_AFFILIATE_ID', 'yoru365-002')
+# FANZA API設定（テスト用に直接設定）
+FANZA_API_ID = 'a2BXCsL2MVUtUeuFBZ1h'
+FANZA_AFFILIATE_ID = 'yoru365-002'
 
 # サイトURL
 SITE_URL = 'https://self-pleasure-jp.github.io/guide/'
