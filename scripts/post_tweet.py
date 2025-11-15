@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA自動ツイート投稿スクリプト（API直接呼び出し版）
-- 毎回APIから最新データを取得
+FANZA自動ツイート投稿スクリプト（最適化版）
+- 必要最小限のAPI呼び出し（hits=20）
+- offsetは使わない
 - 投稿済みIDを記録して完全に重複を防止
 """
 
@@ -68,8 +69,8 @@ def save_counter(counter):
         f.write(str(counter))
     print(f"💾 Saved counter: {counter}")
 
-def fetch_fanza_new_releases(offset=1, hits=100):
-    """FANZAの新着作品を取得"""
+def fetch_fanza_new_releases(hits=20):
+    """FANZAの新着作品を取得（最小限）"""
     url = "https://api.dmm.com/affiliate/v3/ItemList"
     params = {
         'api_id': FANZA_API_ID,
@@ -78,13 +79,12 @@ def fetch_fanza_new_releases(offset=1, hits=100):
         'service': 'digital',
         'floor': 'videoa',
         'hits': hits,
-        'offset': offset,
         'sort': 'date',  # 新着順
         'output': 'json'
     }
     
     try:
-        print(f"🌐 Fetching FANZA data (offset={offset}, hits={hits})...")
+        print(f"🌐 Fetching FANZA data (hits={hits})...")
         response = requests.get(url, params=params, timeout=30)
         response.raise_for_status()
         data = response.json()
@@ -102,33 +102,27 @@ def fetch_fanza_new_releases(offset=1, hits=100):
 
 def find_next_unposted_item(posted_ids):
     """未投稿のアイテムを探す"""
-    # 複数のオフセットで検索
-    for offset in range(1, 501, 100):  # 1, 101, 201, 301, 401
-        items = fetch_fanza_new_releases(offset=offset, hits=100)
-        
-        if not items:
-            continue
-        
-        # 未投稿のアイテムを探す
-        for item in items:
-            content_id = item.get('content_id')
-            if content_id and content_id not in posted_ids:
-                print(f"🎯 Found unposted item: {content_id} (offset={offset})")
-                return item
-        
-        print(f"⏭️  All items at offset {offset} already posted")
+    # 新着20件を取得
+    items = fetch_fanza_new_releases(hits=20)
+    
+    if not items:
+        print("❌ No items fetched from API")
+        return None
+    
+    # 未投稿のアイテムを探す
+    for item in items:
+        content_id = item.get('content_id')
+        if content_id and content_id not in posted_ids:
+            print(f"🎯 Found unposted item: {content_id}")
+            return item
     
     # すべて投稿済みの場合、履歴をクリア
     print("♻️  All items posted, clearing history...")
     posted_ids.clear()
     save_posted_ids(posted_ids)
     
-    # 再試行
-    items = fetch_fanza_new_releases(offset=1, hits=100)
-    if items:
-        return items[0]
-    
-    return None
+    # 最初のアイテムを返す
+    return items[0] if items else None
 
 def censor_text(text):
     """NGワードを検閲"""
@@ -265,7 +259,7 @@ def post_tweet_with_image(tweet_text, image_data):
         return False
 
 def main():
-    print(f"🚀 Starting FANZA auto-post bot (API Direct Mode) at {datetime.now()}")
+    print(f"🚀 Starting FANZA auto-post bot (Optimized) at {datetime.now()}")
     
     # 投稿済みID読み込み
     posted_ids = load_posted_ids()
