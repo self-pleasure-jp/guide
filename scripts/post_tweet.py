@@ -208,9 +208,7 @@ def create_fallback_tweet():
 FANZA（旧DMM）で人気の作品を毎日更新中
 
 無料サンプルあり
-https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Fdigital%2Fvideoa%2F-%2Flist%2F&af_id=yoru365-990&ch=link_tool&ch_id=link
-
-#FANZA"""
+https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Fdigital%2Fvideoa%2F-%2Flist%2F&af_id=yoru365-990&ch=link_tool&ch_id=link"""
 
 def post_tweet(tweet_text):
     """ツイートを投稿"""
