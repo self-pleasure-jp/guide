@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA自動ツイート投稿スクリプト（画像ぼかし版）
-- ランキング名明記
-- 個別リンク
-- サンプル動画時間表示
-- 画像にガウスぼかし適用（軽め）
+FANZA自動ツイート投稿スクリプト（重複防止版）
+- カウンターファイルを投稿前に更新
+- 投稿済みIDを記録して完全に重複を防止
 """
 
 import os
 import json
 import tweepy
 from datetime import datetime
-import re
 import requests
 from io import BytesIO
 from PIL import Image, ImageFilter
@@ -24,8 +21,9 @@ TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 TWITTER_ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 COUNTER_FILE = 'data/counter.txt'
+POSTED_IDS_FILE = 'data/posted_ids.json'
 DATA_FILE = 'data/fanza_data.json'
-BLUR_RADIUS = 5  # ぼかし強度（軽め：5、中：10、強：15）
+BLUR_RADIUS = 5
 
 def load_fanza_data():
     """JSONデータを読み込み"""
@@ -40,6 +38,27 @@ def load_fanza_data():
     except json.JSONDecodeError as e:
         print(f"❌ JSON decode error: {e}")
         return None
+
+def load_posted_ids():
+    """投稿済みIDリストを読み込み"""
+    try:
+        with open(POSTED_IDS_FILE, 'r', encoding='utf-8') as f:
+            posted = json.load(f)
+            print(f"✅ Loaded {len(posted)} posted IDs")
+            return set(posted)
+    except FileNotFoundError:
+        print("📝 No posted IDs file, starting fresh")
+        return set()
+    except json.JSONDecodeError:
+        print("⚠️ Invalid posted IDs file, starting fresh")
+        return set()
+
+def save_posted_ids(posted_ids):
+    """投稿済みIDリストを保存"""
+    os.makedirs(os.path.dirname(POSTED_IDS_FILE), exist_ok=True)
+    with open(POSTED_IDS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(list(posted_ids), f, ensure_ascii=False, indent=2)
+    print(f"💾 Saved {len(posted_ids)} posted IDs")
 
 def get_current_counter():
     """現在のカウンターを取得"""
@@ -105,16 +124,28 @@ def build_all_items_list(data):
     print(f"📋 Total items: {len(all_items)}")
     return all_items
 
-def select_item_by_counter(all_items, counter):
-    """カウンターに基づいてアイテムを選択"""
+def select_next_unposted_item(all_items, counter, posted_ids):
+    """未投稿のアイテムを選択（カウンターベース）"""
     if not all_items:
-        return None
+        return None, counter
     
-    index = counter % len(all_items)
-    selected = all_items[index]
+    max_attempts = len(all_items)
+    for attempt in range(max_attempts):
+        index = counter % len(all_items)
+        selected = all_items[index]
+        content_id = selected['item'].get('content_id')
+        
+        if content_id and content_id not in posted_ids:
+            print(f"🎯 Selected NEW item {index + 1}/{len(all_items)}: {selected['type']} - {content_id}")
+            return selected, counter + 1
+        else:
+            print(f"⏭️  Skipping already posted: {content_id}")
+            counter += 1
     
-    print(f"🎯 Selected item {index + 1}/{len(all_items)}: {selected['type']}")
-    return selected
+    # 全て投稿済みの場合、リセット
+    print("♻️  All items posted, resetting...")
+    posted_ids.clear()
+    return all_items[0], 1
 
 def censor_text(text):
     """NGワードを検閲"""
@@ -170,15 +201,12 @@ def download_and_blur_image(image_url):
         response = requests.get(image_url, timeout=10)
         response.raise_for_status()
         
-        # 画像を開く
         image = Image.open(BytesIO(response.content))
         print(f"✅ Image downloaded: {image.size}")
         
-        # ガウスぼかしを適用（軽め: radius=5）
         blurred_image = image.filter(ImageFilter.GaussianBlur(radius=BLUR_RADIUS))
         print(f"✅ Applied blur (radius={BLUR_RADIUS})")
         
-        # メモリ上のバイトストリームに保存
         output = BytesIO()
         blurred_image.save(output, format='JPEG', quality=85)
         output.seek(0)
@@ -272,9 +300,8 @@ def post_tweet_with_image(tweet_text, image_data):
             access_token_secret=TWITTER_ACCESS_TOKEN_SECRET
         )
         
-        # ツイート投稿（センシティブ設定付き）
+        # ツイート投稿
         if media_id:
-            # メディアをセンシティブに設定
             api.create_media_metadata(media_id, alt_text="アダルトコンテンツ")
             response = client.create_tweet(text=tweet_text, media_ids=[media_id])
         else:
@@ -292,8 +319,7 @@ def post_tweet_with_image(tweet_text, image_data):
         return False
 
 def main():
-    print(f"🚀 Starting FANZA auto-post bot (Blur Mode) at {datetime.now()}")
-    print(f"🎨 Blur strength: {BLUR_RADIUS} (軽め)")
+    print(f"🚀 Starting FANZA auto-post bot (No Duplicate Mode) at {datetime.now()}")
     
     # データ読み込み
     data = load_fanza_data()
@@ -302,6 +328,9 @@ def main():
         tweet_text = create_fallback_tweet()
         post_tweet_with_image(tweet_text, None)
         return
+    
+    # 投稿済みID読み込み
+    posted_ids = load_posted_ids()
     
     # 全アイテムリスト作成
     all_items = build_all_items_list(data)
@@ -314,19 +343,24 @@ def main():
     # カウンター取得
     counter = get_current_counter()
     
-    # アイテム選択
-    selected = select_item_by_counter(all_items, counter)
+    # 未投稿アイテム選択
+    selected, new_counter = select_next_unposted_item(all_items, counter, posted_ids)
+    
     if not selected:
         print("⚠️ Could not select item, using fallback tweet")
         tweet_text = create_fallback_tweet()
         post_tweet_with_image(tweet_text, None)
         return
     
+    # カウンター更新（投稿前に保存）
+    save_counter(new_counter)
+    
     # ツイート作成
     tweet_text = create_tweet_text(selected)
     
     # 画像取得とぼかし適用
     item = selected['item']
+    content_id = item.get('content_id')
     image_url = item.get('imageURL', {}).get('large') or item.get('imageURL', {}).get('small')
     
     image_data = None
@@ -338,6 +372,7 @@ def main():
     print("\n" + "="*50)
     print("📝 Tweet preview:")
     print("="*50)
+    print(f"Content ID: {content_id}")
     print(tweet_text)
     if image_data:
         print("\n🖼️  Image: Blurred image attached")
@@ -347,11 +382,15 @@ def main():
     success = post_tweet_with_image(tweet_text, image_data)
     
     if success:
-        new_counter = counter + 1
-        save_counter(new_counter)
-        print(f"✅ Counter updated: {counter} → {new_counter}")
+        # 投稿済みIDに追加
+        posted_ids.add(content_id)
+        save_posted_ids(posted_ids)
+        print(f"✅ Added {content_id} to posted IDs")
+        print(f"✅ Post completed! Counter: {counter} → {new_counter}")
     else:
-        print("⚠️ Tweet failed, counter not updated")
+        # 失敗時はカウンターを戻す
+        save_counter(counter)
+        print(f"⚠️ Tweet failed, counter restored to {counter}")
 
 if __name__ == "__main__":
     main()
