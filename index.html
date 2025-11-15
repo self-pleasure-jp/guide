@@ -580,11 +580,6 @@
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
-        <!-- 新人女優（デビュー女優・動的表示） -->
-        <h2 class="section-title">🆕 最新新人AV女優</h2>
-        <div id="debut-actresses-container">
-            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
-        </div>
 
         <div class="credit">
             <p class="credit-text">Powered by <a href="https://affiliate.dmm.com/api/" target="_blank" rel="noopener noreferrer" style="color: #ff3366; text-decoration: none;">FANZA Webサービス</a></p>
@@ -979,9 +974,6 @@ async function loadAllContent() {
     displayProducts('actress-yayoi', fanzaData.actresses?.['弥生みづき'] || [], false);
     displayProducts('actress-aizawa', fanzaData.actresses?.['逢沢みゆ'] || [], false);
     
-    // デビュー女優（動的表示）
-    displayDebutActresses();
-    
     console.log('✅ All content displayed!');
 }
 
@@ -1035,8 +1027,7 @@ function showAllErrors() {
         'creampie-ranking', 'bigbreasts-ranking', 'milf-ranking',
         'amateur-review', 'anime-new',
         'actress-matsumoto', 'actress-misono', 'actress-satsuki',
-        'actress-yayoi', 'actress-aizawa',
-        'debut-actresses-container'
+        'actress-yayoi', 'actress-aizawa'
     ];
     
     const t = translations[currentLang];
@@ -1049,37 +1040,6 @@ function showAllErrors() {
 }
 
 
-// デビュー女優を動的表示
-function displayDebutActresses() {
-    const container = document.getElementById('debut-actresses-container');
-    if (!container) return;
-    
-    if (!fanzaData || !fanzaData.debut_actresses) {
-        container.innerHTML = '<p class="loading">新人女優データが見つかりません</p>';
-        return;
-    }
-    
-    const debutCount = Object.keys(fanzaData.debut_actresses).length;
-    if (debutCount === 0) {
-        container.innerHTML = '<p class="loading">新人女優データが見つかりません</p>';
-        return;
-    }
-    
-    let html = '';
-    for (const [actressName, items] of Object.entries(fanzaData.debut_actresses)) {
-        const containerId = `debut-actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
-        html += `
-            <h3 class="section-title" style="font-size: 18px;">🆕 ${actressName} デビュー作品 TOP 6</h3>
-            <div id="${containerId}" class="products-grid-6"></div>
-        `;
-    }
-    container.innerHTML = html;
-    
-    for (const [actressName, items] of Object.entries(fanzaData.debut_actresses)) {
-        const containerId = `debut-actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
-        displayProducts(containerId, items, false);
-    }
-}
 
 // UI更新関数
 function updateDate() {
