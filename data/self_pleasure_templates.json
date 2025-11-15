@@ -1,7 +1,7 @@
 {
   "templates": [
-    "💕自分を大切にする時間\n\n{message}\n\nセルフプレジャーは、自分自身と向き合う大切な時間です。\n\n{benefit}\n\n#セルフプレジャー #自分を大切に #セルフケア",
-    "✨あなたの心と体を満たす時間\n\n{message}\n\n{benefit}\n\nFANZAで理想の作品を見つけてみませんか？\nhttps://self-pleasure-jp.github.io/guide/\n\n#セルフプレジャー #自分時間 #セルフラブ"
+    "💕自分を大切にする時間\n\n{message}\n\nセルフプレジャーは、自分自身と向き合う大切な時間です。\n\n{benefit}",
+    "✨あなたの心と体を満たす時間\n\n{message}\n\n{benefit}\n\n理想の作品を見つけてみませんか？\nhttps://self-pleasure-jp.github.io/guide/"
   ],
   "message": [
     "罪悪感を感じる必要はありません。",
