@@ -129,7 +129,15 @@ def censor_text(text):
         'ちんこ': 'ち〇こ',
         'オナニー': 'オ〇ニー',
         '手コキ': '手〇キ',
-        'パイズリ': 'パイ〇リ'
+        'パイズリ': 'パイ〇リ',
+        '中出し': '中〇し',
+        '密着': '密〇',
+        '絶倫': '絶〇',
+        '痴女': '痴〇',
+        '人妻': '人〇',
+        '不倫': '不〇',
+        '寝取': '寝〇',
+        'NTR': 'NT〇'
     }
     
     censored = text
@@ -205,9 +213,9 @@ def create_tweet_text(selected):
     elif item_type == 'ranking':
         category = selected['category']
         category_map = {
-            'creampie': '🔥 中出しランキング',
-            'bigbreasts': '👙 巨乳ランキング',
-            'milf': '💋 熟女ランキング'
+            'creampie': '🔥 中〇しランキング',
+            'bigbreasts': '👙 巨〇ランキング',
+            'milf': '💋 熟〇ランキング'
         }
         category_name = category_map.get(category, 'ランキング')
         tweet = f"{category_name}\n\n{title}\n\n{sample_text}\n{url}"
@@ -264,8 +272,10 @@ def post_tweet_with_image(tweet_text, image_data):
             access_token_secret=TWITTER_ACCESS_TOKEN_SECRET
         )
         
-        # ツイート投稿
+        # ツイート投稿（センシティブ設定付き）
         if media_id:
+            # メディアをセンシティブに設定
+            api.create_media_metadata(media_id, alt_text="アダルトコンテンツ")
             response = client.create_tweet(text=tweet_text, media_ids=[media_id])
         else:
             response = client.create_tweet(text=tweet_text)
