@@ -1,10 +1,10 @@
 {
   "templates": [
-    "🔞大人の時間を楽しむなら\nFANZA{service}が充実\n{genre}も豊富\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
-    "🌙夜のお供に最適\nFANZA {genre}\n{service}をチェック\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
-    "💕自分へのご褒美に\nFANZA{service}\n{genre}が見放題\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
-    "✨新しい刺激を求めているあなたへ\nFANZA {genre}\n{service}が充実\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
-    "🎬大人のエンターテイメントをお探しなら\nFANZA{service}\n{genre}も豊富\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/"
+    "🔞大人の時間を楽しむなら\n{service}が充実\n{genre}も豊富\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
+    "🌙夜のお供に最適\n{genre}\n{service}をチェック\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
+    "💕自分へのご褒美に\n{service}\n{genre}が見放題\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
+    "✨新しい刺激を求めているあなたへ\n{genre}\n{service}が充実\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/",
+    "🎬大人のエンターテイメントをお探しなら\n{service}\n{genre}も豊富\n\n{cta}\nhttps://self-pleasure-jp.github.io/guide/"
   ],
   "service": [
     "独占配信作品",
