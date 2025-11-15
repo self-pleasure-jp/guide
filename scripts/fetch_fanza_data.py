@@ -119,6 +119,75 @@ def fetch_actress_works(actress_name, hits=6):
     
     return []
 
+def fetch_popular_actresses(hits=5):
+    """人気女優を取得（固定リスト）"""
+    popular_list = [
+        '松本いちか',
+        '美園和花',
+        '沙月恵奈',
+        '弥生みづき',
+        '逢沢みゆ'
+    ]
+    
+    print(f"✅ Using popular actress list: {len(popular_list)} actresses")
+    return popular_list[:hits]
+
+def fetch_debut_actresses(count=5):
+    """デビュー作品から最新新人女優を取得"""
+    print(f"\n🆕 Fetching debut actresses (top {count})...")
+    
+    # ジャンルID: 6006 = デビュー作品
+    base_url = 'https://api.dmm.com/affiliate/v3/ItemList'
+    
+    params = {
+        'api_id': API_ID,
+        'affiliate_id': AFFILIATE_ID,
+        'site': 'FANZA',
+        'service': 'digital',
+        'floor': 'videoa',
+        'article': 'genre',
+        'article_id': 6006,  # デビュー作品
+        'sort': 'date',      # 新着順
+        'hits': 50,          # 多めに取得して女優を抽出
+        'output': 'json'
+    }
+    
+    try:
+        response = requests.get(base_url, params=params, timeout=30)
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data.get('result') and data['result'].get('items'):
+                items = data['result']['items']
+                
+                # 女優名を抽出（重複を除く）
+                actress_names = []
+                seen_actresses = set()
+                
+                for item in items:
+                    if 'iteminfo' in item and 'actress' in item['iteminfo']:
+                        for actress in item['iteminfo']['actress']:
+                            actress_name = actress.get('name')
+                            if actress_name and actress_name not in seen_actresses:
+                                actress_names.append(actress_name)
+                                seen_actresses.add(actress_name)
+                                
+                                if len(actress_names) >= count:
+                                    break
+                    
+                    if len(actress_names) >= count:
+                        break
+                
+                print(f"✅ Found {len(actress_names)} debut actresses")
+                return actress_names[:count]
+    
+    except Exception as e:
+        print(f"❌ Error fetching debut actresses: {str(e)}")
+    
+    # フォールバック: 空リスト
+    print("⚠️ No debut actresses found")
+    return []
+
 def main():
     print("🚀 Starting FANZA data fetch")
     print(f"📅 Time: {datetime.now().isoformat()}")
@@ -127,7 +196,8 @@ def main():
         'updated_at': datetime.now().isoformat(),
         'rankings': {},
         'floors': {},
-        'actresses': {}
+        'actresses': {},
+        'debut_actresses': {}
     }
     
     # 1. ジャンル別ランキング
@@ -161,20 +231,28 @@ def main():
         all_data['floors'][floor_name] = items
         time.sleep(1)
     
-    # 3. 女優別作品
-    print("\n⭐ Fetching actress works...")
-    actresses = [
-        '松本いちか',
-        '美園和花',
-        '沙月恵奈',
-        '弥生みづき',
-        '逢沢みゆ'
-    ]
+    # 3. 人気女優を取得
+    print("\n⭐ Fetching popular actresses...")
+    popular_actresses = fetch_popular_actresses(hits=5)
     
-    for actress in actresses:
+    # 4. 人気女優別作品
+    print("\n⭐ Fetching popular actress works...")
+    for actress in popular_actresses:
         print(f"\n🔄 Fetching works for {actress}...")
         items = fetch_actress_works(actress, hits=6)
         all_data['actresses'][actress] = items
+        time.sleep(1)
+    
+    # 5. デビュー女優を取得
+    print("\n🆕 Fetching debut actresses...")
+    debut_actresses = fetch_debut_actresses(count=5)
+    
+    # 6. デビュー女優別作品
+    print("\n🆕 Fetching debut actress works...")
+    for actress in debut_actresses:
+        print(f"\n🔄 Fetching debut works for {actress}...")
+        items = fetch_actress_works(actress, hits=6)
+        all_data['debut_actresses'][actress] = items
         time.sleep(1)
     
     # JSONファイルに保存
@@ -190,7 +268,7 @@ def main():
     
     # 統計情報
     total_items = 0
-    for category in ['rankings', 'floors', 'actresses']:
+    for category in ['rankings', 'floors', 'actresses', 'debut_actresses']:
         for key, items in all_data[category].items():
             count = len(items)
             total_items += count
