@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025年　最新の人気無料エロ動画</title>
+    <title id="page-title">2025年　最新の人気無料エロ動画</title>
     <style>
         * {
             margin: 0;
@@ -1094,7 +1094,12 @@ function updateDate() {
         .replace('{month}', month)
         .replace('{day}', day);
     
+    // h1タイトルを更新
     document.getElementById('main-title').textContent = title;
+    
+    // <title>タグも更新
+    const pageTitle = `${year}年${month}月${day}日　最新の人気無料エロ動画`;
+    document.getElementById('page-title').textContent = pageTitle;
 }
 
 function updateUILanguage(lang) {
