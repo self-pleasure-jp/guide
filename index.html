@@ -552,31 +552,15 @@
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
-        <!-- 女優別 -->
-        <h2 class="section-title">⭐ 人気女優 出演作品</h2>
-        
-        <h3 class="section-title" style="font-size: 18px;">松本いちか 出演作品 TOP 6</h3>
-        <div id="actress-matsumoto" class="products-grid-6">
+        <!-- 女優別（人気女優） -->
+        <h2 class="section-title">⭐ 人気AV女優 出演作品</h2>
+        <div id="actresses-container">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
-        <h3 class="section-title" style="font-size: 18px;">美園和花 出演作品 TOP 6</h3>
-        <div id="actress-misono" class="products-grid-6">
-            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
-        </div>
-
-        <h3 class="section-title" style="font-size: 18px;">沙月恵奈 出演作品 TOP 6</h3>
-        <div id="actress-satsuki" class="products-grid-6">
-            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
-        </div>
-
-        <h3 class="section-title" style="font-size: 18px;">弥生みづき 出演作品 TOP 6</h3>
-        <div id="actress-yayoi" class="products-grid-6">
-            <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
-        </div>
-
-        <h3 class="section-title" style="font-size: 18px;">逢沢みゆ 出演作品 TOP 6</h3>
-        <div id="actress-aizawa" class="products-grid-6">
+        <!-- 新人女優（デビュー女優） -->
+        <h2 class="section-title">🆕 最新新人AV女優</h2>
+        <div id="debut-actresses-container">
             <div class="loading"><div class="spinner"></div><div>読み込み中...</div></div>
         </div>
 
@@ -966,12 +950,11 @@ async function loadAllContent() {
     displayProducts('amateur-review', fanzaData.floors.amateur, true);
     displayProducts('anime-new', fanzaData.floors.anime, true);
     
-    // 女優データを表示
-    displayProducts('actress-matsumoto', fanzaData.actresses['松本いちか'], false);
-    displayProducts('actress-misono', fanzaData.actresses['美園和花'], false);
-    displayProducts('actress-satsuki', fanzaData.actresses['沙月恵奈'], false);
-    displayProducts('actress-yayoi', fanzaData.actresses['弥生みづき'], false);
-    displayProducts('actress-aizawa', fanzaData.actresses['逢沢みゆ'], false);
+    // 人気女優を動的表示
+    displayActresses();
+    
+    // デビュー女優を動的表示
+    displayDebutActresses();
     
     console.log('✅ All content displayed!');
 }
@@ -1025,8 +1008,7 @@ function showAllErrors() {
     const containers = [
         'creampie-ranking', 'bigbreasts-ranking', 'milf-ranking',
         'amateur-review', 'anime-new',
-        'actress-matsumoto', 'actress-misono', 'actress-satsuki',
-        'actress-yayoi', 'actress-aizawa'
+        'actresses-container', 'debut-actresses-container'
     ];
     
     const t = translations[currentLang];
@@ -1036,6 +1018,64 @@ function showAllErrors() {
             container.innerHTML = `<p class="loading">${t.noContent}</p>`;
         }
     });
+}
+
+// 人気女優を動的表示
+function displayActresses() {
+    const container = document.getElementById('actresses-container');
+    if (!container) return;
+    
+    if (!fanzaData || !fanzaData.actresses) {
+        container.innerHTML = '<p class="loading">人気女優データが見つかりません</p>';
+        return;
+    }
+    
+    let html = '';
+    for (const [actressName, items] of Object.entries(fanzaData.actresses)) {
+        const containerId = `actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
+        html += `
+            <h3 class="section-title" style="font-size: 18px;">${actressName} 出演作品 TOP 6</h3>
+            <div id="${containerId}" class="products-grid-6"></div>
+        `;
+    }
+    container.innerHTML = html;
+    
+    for (const [actressName, items] of Object.entries(fanzaData.actresses)) {
+        const containerId = `actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
+        displayProducts(containerId, items, false);
+    }
+}
+
+// デビュー女優を動的表示
+function displayDebutActresses() {
+    const container = document.getElementById('debut-actresses-container');
+    if (!container) return;
+    
+    if (!fanzaData || !fanzaData.debut_actresses) {
+        container.innerHTML = '<p class="loading">新人女優データが見つかりません</p>';
+        return;
+    }
+    
+    const debutCount = Object.keys(fanzaData.debut_actresses).length;
+    if (debutCount === 0) {
+        container.innerHTML = '<p class="loading">新人女優データが見つかりません</p>';
+        return;
+    }
+    
+    let html = '';
+    for (const [actressName, items] of Object.entries(fanzaData.debut_actresses)) {
+        const containerId = `debut-actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
+        html += `
+            <h3 class="section-title" style="font-size: 18px;">🆕 ${actressName} デビュー作品 TOP 6</h3>
+            <div id="${containerId}" class="products-grid-6"></div>
+        `;
+    }
+    container.innerHTML = html;
+    
+    for (const [actressName, items] of Object.entries(fanzaData.debut_actresses)) {
+        const containerId = `debut-actress-${actressName.replace(/[^a-zA-Z0-9]/g, '')}`;
+        displayProducts(containerId, items, false);
+    }
 }
 
 // UI更新関数
