@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA自動ツイート投稿スクリプト（重複防止版）
-- カウンターファイルを投稿前に更新
+FANZA自動ツイート投稿スクリプト（API直接呼び出し版）
+- 毎回APIから最新データを取得
 - 投稿済みIDを記録して完全に重複を防止
 """
 
@@ -15,6 +15,8 @@ from io import BytesIO
 from PIL import Image, ImageFilter
 
 # 環境変数から認証情報を取得
+FANZA_API_ID = os.environ.get('FANZA_API_ID')
+FANZA_AFFILIATE_ID = os.environ.get('FANZA_AFFILIATE_ID')
 TWITTER_API_KEY = os.environ.get('TWITTER_API_KEY')
 TWITTER_API_SECRET = os.environ.get('TWITTER_API_SECRET')
 TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
@@ -22,22 +24,7 @@ TWITTER_ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 COUNTER_FILE = 'data/counter.txt'
 POSTED_IDS_FILE = 'data/posted_ids.json'
-DATA_FILE = 'data/fanza_data.json'
 BLUR_RADIUS = 5
-
-def load_fanza_data():
-    """JSONデータを読み込み"""
-    try:
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            print(f"✅ Loaded data from {DATA_FILE}")
-            return data
-    except FileNotFoundError:
-        print(f"❌ Error: {DATA_FILE} not found")
-        return None
-    except json.JSONDecodeError as e:
-        print(f"❌ JSON decode error: {e}")
-        return None
 
 def load_posted_ids():
     """投稿済みIDリストを読み込み"""
@@ -81,71 +68,67 @@ def save_counter(counter):
         f.write(str(counter))
     print(f"💾 Saved counter: {counter}")
 
-def build_all_items_list(data):
-    """全アイテムをフラットなリストに変換"""
-    all_items = []
+def fetch_fanza_new_releases(offset=1, hits=100):
+    """FANZAの新着作品を取得"""
+    url = "https://api.dmm.com/affiliate/v3/ItemList"
+    params = {
+        'api_id': FANZA_API_ID,
+        'affiliate_id': FANZA_AFFILIATE_ID,
+        'site': 'FANZA',
+        'service': 'digital',
+        'floor': 'videoa',
+        'hits': hits,
+        'offset': offset,
+        'sort': 'date',  # 新着順
+        'output': 'json'
+    }
     
-    # ランキング
-    for category, items in data.get('rankings', {}).items():
-        for item in items:
-            all_items.append({
-                'type': 'ranking',
-                'category': category,
-                'item': item
-            })
-    
-    # フロア
-    for floor, items in data.get('floors', {}).items():
-        for item in items:
-            all_items.append({
-                'type': 'floor',
-                'floor': floor,
-                'item': item
-            })
-    
-    # 人気女優
-    for actress, items in data.get('actresses', {}).items():
-        for item in items:
-            all_items.append({
-                'type': 'actress',
-                'name': actress,
-                'item': item
-            })
-    
-    # デビュー女優
-    for actress, items in data.get('debut_actresses', {}).items():
-        for item in items:
-            all_items.append({
-                'type': 'debut',
-                'name': actress,
-                'item': item
-            })
-    
-    print(f"📋 Total items: {len(all_items)}")
-    return all_items
-
-def select_next_unposted_item(all_items, counter, posted_ids):
-    """未投稿のアイテムを選択（カウンターベース）"""
-    if not all_items:
-        return None, counter
-    
-    max_attempts = len(all_items)
-    for attempt in range(max_attempts):
-        index = counter % len(all_items)
-        selected = all_items[index]
-        content_id = selected['item'].get('content_id')
+    try:
+        print(f"🌐 Fetching FANZA data (offset={offset}, hits={hits})...")
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
         
-        if content_id and content_id not in posted_ids:
-            print(f"🎯 Selected NEW item {index + 1}/{len(all_items)}: {selected['type']} - {content_id}")
-            return selected, counter + 1
+        if data.get('result', {}).get('status') == 200:
+            items = data.get('result', {}).get('items', [])
+            print(f"✅ Fetched {len(items)} items from API")
+            return items
         else:
-            print(f"⏭️  Skipping already posted: {content_id}")
-            counter += 1
+            print(f"⚠️ API Error: {data}")
+            return []
+    except Exception as e:
+        print(f"❌ API Error: {e}")
+        return []
+
+def find_next_unposted_item(posted_ids):
+    """未投稿のアイテムを探す"""
+    # 複数のオフセットで検索
+    for offset in range(1, 501, 100):  # 1, 101, 201, 301, 401
+        items = fetch_fanza_new_releases(offset=offset, hits=100)
+        
+        if not items:
+            continue
+        
+        # 未投稿のアイテムを探す
+        for item in items:
+            content_id = item.get('content_id')
+            if content_id and content_id not in posted_ids:
+                print(f"🎯 Found unposted item: {content_id} (offset={offset})")
+                return item
+        
+        print(f"⏭️  All items at offset {offset} already posted")
     
-    # 全て投稿済みの場合、リセット
-    print("♻️  All items posted, resetting...")
+    # すべて投稿済みの場合、履歴をクリア
+    print("♻️  All items posted, clearing history...")
     posted_ids.clear()
-    return all_items[0], 1
+    save_posted_ids(posted_ids)
+    
+    # 再試行
+    items = fetch_fanza_new_releases(offset=1, hits=100)
+    if items:
+        return items[0]
+    
+    return None
 
 def censor_text(text):
     """NGワードを検閲"""
@@ -177,23 +160,6 @@ def censor_text(text):
     
     return censored
 
-def format_sample_time(item):
-    """サンプル動画の時間をフォーマット"""
-    sample_url = item.get('sampleMovieURL', {})
-    
-    if isinstance(sample_url, dict):
-        for key, value in sample_url.items():
-            if isinstance(value, dict) and 'duration' in value:
-                duration = value['duration']
-                try:
-                    minutes = int(duration) // 60
-                    seconds = int(duration) % 60
-                    return f"({minutes:02d}:{seconds:02d})"
-                except:
-                    pass
-    
-    return ""
-
 def download_and_blur_image(image_url):
     """画像をダウンロードしてぼかしを適用"""
     try:
@@ -217,59 +183,39 @@ def download_and_blur_image(image_url):
         print(f"❌ Error processing image: {e}")
         return None
 
-def create_tweet_text(selected):
+def create_tweet_text(item):
     """投稿テキストを生成"""
-    item_type = selected['type']
-    item = selected['item']
     title = censor_text(item.get('title', 'タイトル不明'))
-    url = item.get('affiliateURL', item.get('URL', ''))
+    url = item.get('affiliateURL', '')
     
     if len(title) > 70:
         title = title[:67] + '...'
     
-    sample_time = format_sample_time(item)
-    sample_text = f"無料サンプルあり{sample_time}" if sample_time else "無料サンプルあり"
+    # ジャンル取得
+    genres = item.get('iteminfo', {}).get('genre', [])
+    genre_text = ''
+    if genres:
+        genre_names = [g.get('name', '') for g in genres[:2]]
+        genre_text = ' / '.join(genre_names)
     
-    if item_type == 'debut':
-        actress_name = selected['name']
-        tweet = f"🆕 新人AV女優デビュー\n\n{actress_name}\n{title}\n\n{sample_text}\n{url}"
+    # 女優取得
+    actresses = item.get('iteminfo', {}).get('actress', [])
+    actress_text = ''
+    if actresses:
+        actress_names = [a.get('name', '') for a in actresses[:2]]
+        actress_text = ' / '.join(actress_names)
     
-    elif item_type == 'actress':
-        actress_name = selected['name']
-        tweet = f"⭐ 人気AV女優\n\n{actress_name}\n{title}\n\n{sample_text}\n{url}"
+    tweet = f"🔥 新作動画\n{title}\n\n"
     
-    elif item_type == 'ranking':
-        category = selected['category']
-        category_map = {
-            'creampie': '🔥 中〇しランキング',
-            'bigbreasts': '👙 巨〇ランキング',
-            'milf': '💋 熟〇ランキング'
-        }
-        category_name = category_map.get(category, 'ランキング')
-        tweet = f"{category_name}\n\n{title}\n\n{sample_text}\n{url}"
+    if actress_text:
+        tweet += f"出演: {actress_text}\n"
     
-    elif item_type == 'floor':
-        floor = selected['floor']
-        floor_map = {
-            'amateur': '📺 素人チャンネル',
-            'anime': '🎬 アニメ動画'
-        }
-        floor_name = floor_map.get(floor, 'チャンネル')
-        tweet = f"{floor_name}\n\n{title}\n\n{sample_text}\n{url}"
+    if genre_text:
+        tweet += f"{genre_text}\n"
     
-    else:
-        tweet = f"{title}\n\n{sample_text}\n{url}"
+    tweet += f"\n{url}"
     
     return tweet
-
-def create_fallback_tweet():
-    """フォールバックツイート"""
-    return """🔥 最新のアダルト動画をチェック！
-
-FANZA（旧DMM）で人気の作品を毎日更新中
-
-無料サンプルあり
-https://al.dmm.co.jp/?lurl=https%3A%2F%2Fwww.dmm.co.jp%2Fdigital%2Fvideoa%2F-%2Flist%2F&af_id=yoru365-990&ch=link_tool&ch_id=link"""
 
 def post_tweet_with_image(tweet_text, image_data):
     """画像付きツイートを投稿"""
@@ -319,48 +265,25 @@ def post_tweet_with_image(tweet_text, image_data):
         return False
 
 def main():
-    print(f"🚀 Starting FANZA auto-post bot (No Duplicate Mode) at {datetime.now()}")
-    
-    # データ読み込み
-    data = load_fanza_data()
-    if not data:
-        print("⚠️ No data loaded, using fallback tweet")
-        tweet_text = create_fallback_tweet()
-        post_tweet_with_image(tweet_text, None)
-        return
+    print(f"🚀 Starting FANZA auto-post bot (API Direct Mode) at {datetime.now()}")
     
     # 投稿済みID読み込み
     posted_ids = load_posted_ids()
     
-    # 全アイテムリスト作成
-    all_items = build_all_items_list(data)
-    if not all_items:
-        print("⚠️ No items found, using fallback tweet")
-        tweet_text = create_fallback_tweet()
-        post_tweet_with_image(tweet_text, None)
+    # 未投稿アイテムを検索
+    item = find_next_unposted_item(posted_ids)
+    
+    if not item:
+        print("❌ Could not find any item to post")
         return
     
-    # カウンター取得
-    counter = get_current_counter()
-    
-    # 未投稿アイテム選択
-    selected, new_counter = select_next_unposted_item(all_items, counter, posted_ids)
-    
-    if not selected:
-        print("⚠️ Could not select item, using fallback tweet")
-        tweet_text = create_fallback_tweet()
-        post_tweet_with_image(tweet_text, None)
-        return
-    
-    # カウンター更新（投稿前に保存）
-    save_counter(new_counter)
+    content_id = item.get('content_id')
+    print(f"📦 Selected item: {content_id}")
     
     # ツイート作成
-    tweet_text = create_tweet_text(selected)
+    tweet_text = create_tweet_text(item)
     
     # 画像取得とぼかし適用
-    item = selected['item']
-    content_id = item.get('content_id')
     image_url = item.get('imageURL', {}).get('large') or item.get('imageURL', {}).get('small')
     
     image_data = None
@@ -386,11 +309,13 @@ def main():
         posted_ids.add(content_id)
         save_posted_ids(posted_ids)
         print(f"✅ Added {content_id} to posted IDs")
-        print(f"✅ Post completed! Counter: {counter} → {new_counter}")
+        
+        # カウンター更新
+        counter = get_current_counter()
+        save_counter(counter + 1)
+        print(f"✅ Post completed! Counter: {counter} → {counter + 1}")
     else:
-        # 失敗時はカウンターを戻す
-        save_counter(counter)
-        print(f"⚠️ Tweet failed, counter restored to {counter}")
+        print(f"⚠️ Tweet failed")
 
 if __name__ == "__main__":
     main()
