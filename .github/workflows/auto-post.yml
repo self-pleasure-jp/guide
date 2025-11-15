@@ -1,5 +1,4 @@
 name: FANZA Auto Post
-
 on:
   schedule:
     # 夜の投稿スケジュール（新着作品1〜6を順番に投稿）
@@ -33,7 +32,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install tweepy requests
+        pip install tweepy requests Pillow
     
     - name: Post tweet
       env:
