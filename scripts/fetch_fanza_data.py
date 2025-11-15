@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA データ取得スクリプト（修正版）
+FANZA データ取得スクリプト（完全版）
 毎朝実行してデータをJSONファイルに保存
-- 人気女優をAPIから動的取得
+- 人気女優をAPIから動的取得（フォールバックなし）
 - デビュー女優の取得ロジック改善
+- エラー時は空リストを返して明示的に検出
 """
 
 import os
@@ -123,7 +124,7 @@ def fetch_actress_works(actress_name, hits=6):
     return []
 
 def fetch_popular_actresses(count=5):
-    """人気女優をAPIから動的に取得"""
+    """人気女優をAPIから動的に取得（フォールバックなし）"""
     print(f"\n⭐ Fetching popular actresses (top {count})...")
     
     # 最近の人気作品から女優を抽出
@@ -175,16 +176,9 @@ def fetch_popular_actresses(count=5):
     except Exception as e:
         print(f"❌ Error fetching popular actresses: {str(e)}")
     
-    # フォールバック: 固定リスト
-    print("⚠️ Using fallback list")
-    fallback_list = [
-        '松本いちか',
-        '美園和花',
-        '沙月恵奈',
-        '弥生みづき',
-        '逢沢みゆ'
-    ]
-    return fallback_list[:count]
+    # エラー時は空リストを返す（フォールバックなし）
+    print("❌ Failed to fetch popular actresses, returning empty list")
+    return []
 
 def fetch_debut_actresses(count=5):
     """デビュー作品から最新新人女優を取得"""
@@ -233,19 +227,20 @@ def fetch_debut_actresses(count=5):
                         break
                 
                 print(f"✅ Found {len(actress_names)} debut actresses")
-                print(f"   Debut actresses: {', '.join(actress_names)}")
+                if actress_names:
+                    print(f"   Debut actresses: {', '.join(actress_names)}")
                 
                 return actress_names[:count]
     
     except Exception as e:
         print(f"❌ Error fetching debut actresses: {str(e)}")
     
-    # フォールバック: 空リスト
-    print("⚠️ No debut actresses found, using empty list")
+    # エラー時は空リストを返す
+    print("❌ Failed to fetch debut actresses, returning empty list")
     return []
 
 def main():
-    print("🚀 Starting FANZA data fetch (Fixed Version)")
+    print("🚀 Starting FANZA data fetch (Complete Version)")
     print(f"📅 Time: {datetime.now().isoformat()}")
     print("=" * 60)
     
@@ -290,19 +285,22 @@ def main():
         all_data['floors'][floor_name] = items
         time.sleep(1)
     
-    # 3. 人気女優を取得（APIから動的取得）
-    print("\n⭐ Fetching popular actresses (dynamic)...")
+    # 3. 人気女優を取得（APIから動的取得、フォールバックなし）
+    print("\n⭐ Fetching popular actresses (dynamic, no fallback)...")
     print("-" * 60)
     popular_actresses = fetch_popular_actresses(count=5)
     
     # 4. 人気女優別作品
-    print("\n⭐ Fetching popular actress works...")
-    print("-" * 60)
-    for actress in popular_actresses:
-        print(f"\n🔄 Fetching works for {actress}...")
-        items = fetch_actress_works(actress, hits=6)
-        all_data['actresses'][actress] = items
-        time.sleep(1)
+    if popular_actresses:
+        print("\n⭐ Fetching popular actress works...")
+        print("-" * 60)
+        for actress in popular_actresses:
+            print(f"\n🔄 Fetching works for {actress}...")
+            items = fetch_actress_works(actress, hits=6)
+            all_data['actresses'][actress] = items
+            time.sleep(1)
+    else:
+        print("\n⚠️ No popular actresses found, skipping actress works fetch")
     
     # 5. デビュー女優を取得
     print("\n🆕 Fetching debut actresses (dynamic)...")
@@ -337,19 +335,33 @@ def main():
     print("\n📊 Summary:")
     print("-" * 60)
     total_items = 0
+    error_count = 0
+    
     for category in ['rankings', 'floors', 'actresses', 'debut_actresses']:
         category_total = 0
         for key, items in all_data[category].items():
             count = len(items)
             category_total += count
-            print(f"  {category}/{key}: {count} items")
+            status = "✅" if count > 0 else "❌"
+            print(f"  {status} {category}/{key}: {count} items")
+            if count == 0:
+                error_count += 1
         total_items += category_total
         if category_total > 0:
             print(f"  └─ {category} total: {category_total} items")
     
     print(f"\n📦 Total items: {total_items}")
+    
+    if error_count > 0:
+        print(f"⚠️  Warning: {error_count} categories failed to fetch data")
+    
     print("=" * 60)
-    print("✅ Fetch completed successfully")
+    
+    if total_items > 0:
+        print("✅ Fetch completed successfully")
+    else:
+        print("❌ Fetch completed with errors - no data retrieved")
+        exit(1)  # GitHub Actionsでエラーとして検出
 
 if __name__ == '__main__':
     main()
