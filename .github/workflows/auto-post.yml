@@ -1,22 +1,32 @@
-name: FANZA Auto Post (No Duplicate)
+name: FANZA Product Posts (18/day)
 
 on:
   schedule:
-    # 夜の投稿スケジュール（新着作品1〜6を順番に投稿）
-    # JST 18:00 (UTC 09:00)
-    - cron: '0 9 * * *'
-    # JST 19:16 (UTC 10:16)
-    - cron: '16 10 * * *'
-    # JST 20:46 (UTC 11:46)
-    - cron: '46 11 * * *'
-    # JST 21:36 (UTC 12:36)
-    - cron: '36 12 * * *'
-    # JST 22:26 (UTC 13:26)
-    - cron: '26 13 * * *'
-    # JST 23:06 (UTC 14:06)
-    - cron: '06 14 * * *'
+    # 朝の投稿（6回）: 7:00, 8:20, 9:40, 10:30, 11:20, 12:00
+    - cron: '0 22 * * *'   # JST 7:00 (UTC 22:00前日)
+    - cron: '20 23 * * *'  # JST 8:20 (UTC 23:20前日)
+    - cron: '40 0 * * *'   # JST 9:40 (UTC 0:40)
+    - cron: '30 1 * * *'   # JST 10:30 (UTC 1:30)
+    - cron: '20 2 * * *'   # JST 11:20 (UTC 2:20)
+    - cron: '0 3 * * *'    # JST 12:00 (UTC 3:00)
+    
+    # 昼の投稿（6回）: 13:00, 14:10, 15:20, 16:30, 17:00, 17:45
+    - cron: '0 4 * * *'    # JST 13:00 (UTC 4:00)
+    - cron: '10 5 * * *'   # JST 14:10 (UTC 5:10)
+    - cron: '20 6 * * *'   # JST 15:20 (UTC 6:20)
+    - cron: '30 7 * * *'   # JST 16:30 (UTC 7:30)
+    - cron: '0 8 * * *'    # JST 17:00 (UTC 8:00)
+    - cron: '45 8 * * *'   # JST 17:45 (UTC 8:45)
+    
+    # 夜の投稿（6回）: 18:00, 19:15, 20:30, 21:30, 22:15, 23:00
+    - cron: '0 9 * * *'    # JST 18:00 (UTC 9:00)
+    - cron: '15 10 * * *'  # JST 19:15 (UTC 10:15)
+    - cron: '30 11 * * *'  # JST 20:30 (UTC 11:30)
+    - cron: '30 12 * * *'  # JST 21:30 (UTC 12:30)
+    - cron: '15 13 * * *'  # JST 22:15 (UTC 13:15)
+    - cron: '0 14 * * *'   # JST 23:00 (UTC 14:00)
   
-  workflow_dispatch:  # 手動実行可能
+  workflow_dispatch:
 
 jobs:
   post-tweet:
@@ -51,5 +61,5 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add data/counter.txt data/posted_ids.json
-        git diff --quiet && git diff --staged --quiet || git commit -m "Update counter and posted IDs - $(date +'%Y-%m-%d %H:%M')"
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update counter - $(date +'%Y-%m-%d %H:%M')"
         git push
