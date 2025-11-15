@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FANZA データ取得スクリプト
+FANZA データ取得スクリプト（修正版）
 毎朝実行してデータをJSONファイルに保存
+- 人気女優をAPIから動的取得
+- デビュー女優の取得ロジック改善
 """
 
 import os
@@ -15,7 +17,7 @@ import time
 API_ID = 'a2BXCsL2MVUtUeuFBZ1h'
 AFFILIATE_ID = 'yoru365-990'
 
-def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa'):
+def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa', offset=1):
     """FANZA APIからデータを取得"""
     base_url = 'https://api.dmm.com/affiliate/v3/ItemList'
     
@@ -27,6 +29,7 @@ def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa'):
         'floor': floor,
         'sort': sort,
         'hits': hits,
+        'offset': offset,
         'output': 'json'
     }
     
@@ -38,7 +41,7 @@ def fetch_fanza_data(sort='rank', hits=50, genre_id=None, floor='videoa'):
     for attempt in range(max_retries):
         try:
             print(f"🔄 Fetching {sort} data (attempt {attempt + 1}/{max_retries})...")
-            response = requests.get(base_url, params=params, timeout=600)
+            response = requests.get(base_url, params=params, timeout=60)
             
             print(f"📊 Response status: {response.status_code}")
             
@@ -119,18 +122,69 @@ def fetch_actress_works(actress_name, hits=6):
     
     return []
 
-def fetch_popular_actresses(hits=5):
-    """人気女優を取得（固定リスト）"""
-    popular_list = [
+def fetch_popular_actresses(count=5):
+    """人気女優をAPIから動的に取得"""
+    print(f"\n⭐ Fetching popular actresses (top {count})...")
+    
+    # 最近の人気作品から女優を抽出
+    base_url = 'https://api.dmm.com/affiliate/v3/ItemList'
+    
+    params = {
+        'api_id': API_ID,
+        'affiliate_id': AFFILIATE_ID,
+        'site': 'FANZA',
+        'service': 'digital',
+        'floor': 'videoa',
+        'sort': 'rank',  # ランキング順
+        'hits': 100,      # 多めに取得して女優を抽出
+        'output': 'json'
+    }
+    
+    actress_frequency = {}  # 女優名と出現回数
+    
+    try:
+        response = requests.get(base_url, params=params, timeout=30)
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data.get('result') and data['result'].get('items'):
+                items = data['result']['items']
+                
+                # 女優の出現回数をカウント
+                for item in items:
+                    if 'iteminfo' in item and 'actress' in item['iteminfo']:
+                        for actress in item['iteminfo']['actress']:
+                            actress_name = actress.get('name')
+                            if actress_name:
+                                actress_frequency[actress_name] = actress_frequency.get(actress_name, 0) + 1
+                
+                # 出現回数でソートして上位を取得
+                sorted_actresses = sorted(
+                    actress_frequency.items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )
+                
+                popular_actresses = [name for name, freq in sorted_actresses[:count]]
+                
+                print(f"✅ Found {len(popular_actresses)} popular actresses")
+                print(f"   Top actresses: {', '.join(popular_actresses)}")
+                
+                return popular_actresses
+    
+    except Exception as e:
+        print(f"❌ Error fetching popular actresses: {str(e)}")
+    
+    # フォールバック: 固定リスト
+    print("⚠️ Using fallback list")
+    fallback_list = [
         '松本いちか',
         '美園和花',
         '沙月恵奈',
         '弥生みづき',
         '逢沢みゆ'
     ]
-    
-    print(f"✅ Using popular actress list: {len(popular_list)} actresses")
-    return popular_list[:hits]
+    return fallback_list[:count]
 
 def fetch_debut_actresses(count=5):
     """デビュー作品から最新新人女優を取得"""
@@ -160,7 +214,7 @@ def fetch_debut_actresses(count=5):
             if data.get('result') and data['result'].get('items'):
                 items = data['result']['items']
                 
-                # 女優名を抽出（重複を除く）
+                # 女優名を抽出（重複を除く、新しい順）
                 actress_names = []
                 seen_actresses = set()
                 
@@ -179,18 +233,21 @@ def fetch_debut_actresses(count=5):
                         break
                 
                 print(f"✅ Found {len(actress_names)} debut actresses")
+                print(f"   Debut actresses: {', '.join(actress_names)}")
+                
                 return actress_names[:count]
     
     except Exception as e:
         print(f"❌ Error fetching debut actresses: {str(e)}")
     
     # フォールバック: 空リスト
-    print("⚠️ No debut actresses found")
+    print("⚠️ No debut actresses found, using empty list")
     return []
 
 def main():
-    print("🚀 Starting FANZA data fetch")
+    print("🚀 Starting FANZA data fetch (Fixed Version)")
     print(f"📅 Time: {datetime.now().isoformat()}")
+    print("=" * 60)
     
     all_data = {
         'updated_at': datetime.now().isoformat(),
@@ -202,6 +259,7 @@ def main():
     
     # 1. ジャンル別ランキング
     print("\n📊 Fetching genre rankings...")
+    print("-" * 60)
     genres = {
         'creampie': 5001,
         'bigbreasts': 2001,
@@ -216,6 +274,7 @@ def main():
     
     # 2. フロア別ランキング
     print("\n📺 Fetching floor rankings...")
+    print("-" * 60)
     floors = {
         'amateur': {'floor': 'videoc', 'sort': 'review'},
         'anime': {'floor': 'anime', 'sort': 'date'}
@@ -231,12 +290,14 @@ def main():
         all_data['floors'][floor_name] = items
         time.sleep(1)
     
-    # 3. 人気女優を取得
-    print("\n⭐ Fetching popular actresses...")
-    popular_actresses = fetch_popular_actresses(hits=5)
+    # 3. 人気女優を取得（APIから動的取得）
+    print("\n⭐ Fetching popular actresses (dynamic)...")
+    print("-" * 60)
+    popular_actresses = fetch_popular_actresses(count=5)
     
     # 4. 人気女優別作品
     print("\n⭐ Fetching popular actress works...")
+    print("-" * 60)
     for actress in popular_actresses:
         print(f"\n🔄 Fetching works for {actress}...")
         items = fetch_actress_works(actress, hits=6)
@@ -244,16 +305,21 @@ def main():
         time.sleep(1)
     
     # 5. デビュー女優を取得
-    print("\n🆕 Fetching debut actresses...")
+    print("\n🆕 Fetching debut actresses (dynamic)...")
+    print("-" * 60)
     debut_actresses = fetch_debut_actresses(count=5)
     
     # 6. デビュー女優別作品
-    print("\n🆕 Fetching debut actress works...")
-    for actress in debut_actresses:
-        print(f"\n🔄 Fetching debut works for {actress}...")
-        items = fetch_actress_works(actress, hits=6)
-        all_data['debut_actresses'][actress] = items
-        time.sleep(1)
+    if debut_actresses:
+        print("\n🆕 Fetching debut actress works...")
+        print("-" * 60)
+        for actress in debut_actresses:
+            print(f"\n🔄 Fetching debut works for {actress}...")
+            items = fetch_actress_works(actress, hits=6)
+            all_data['debut_actresses'][actress] = items
+            time.sleep(1)
+    else:
+        print("\n⚠️ No debut actresses found, skipping debut works fetch")
     
     # JSONファイルに保存
     output_dir = 'data'
@@ -264,17 +330,25 @@ def main():
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(all_data, f, ensure_ascii=False, indent=2)
     
-    print(f"\n✅ Data saved to {output_file}")
+    print(f"\n" + "=" * 60)
+    print(f"✅ Data saved to {output_file}")
     
     # 統計情報
+    print("\n📊 Summary:")
+    print("-" * 60)
     total_items = 0
     for category in ['rankings', 'floors', 'actresses', 'debut_actresses']:
+        category_total = 0
         for key, items in all_data[category].items():
             count = len(items)
-            total_items += count
+            category_total += count
             print(f"  {category}/{key}: {count} items")
+        total_items += category_total
+        if category_total > 0:
+            print(f"  └─ {category} total: {category_total} items")
     
     print(f"\n📦 Total items: {total_items}")
+    print("=" * 60)
     print("✅ Fetch completed successfully")
 
 if __name__ == '__main__':
