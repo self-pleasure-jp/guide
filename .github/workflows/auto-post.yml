@@ -1,18 +1,19 @@
-name: FANZA Auto Post
+name: FANZA Auto Post (No Duplicate)
+
 on:
   schedule:
     # 夜の投稿スケジュール（新着作品1〜6を順番に投稿）
-    # JST 18:00 (UTC 09:00) - 新着1つ目
+    # JST 18:00 (UTC 09:00)
     - cron: '0 9 * * *'
-    # JST 19:16 (UTC 10:16) - 新着2つ目
+    # JST 19:16 (UTC 10:16)
     - cron: '16 10 * * *'
-    # JST 20:46 (UTC 11:46) - 新着3つ目
+    # JST 20:46 (UTC 11:46)
     - cron: '46 11 * * *'
-    # JST 21:36 (UTC 12:36) - 新着4つ目
+    # JST 21:36 (UTC 12:36)
     - cron: '36 12 * * *'
-    # JST 22:26 (UTC 13:26) - 新着5つ目
+    # JST 22:26 (UTC 13:26)
     - cron: '26 13 * * *'
-    # JST 23:06 (UTC 14:06) - 新着6つ目
+    # JST 23:06 (UTC 14:06)
     - cron: '06 14 * * *'
   
   workflow_dispatch:  # 手動実行可能
@@ -44,3 +45,11 @@ jobs:
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
       run: |
         python scripts/post_tweet.py
+    
+    - name: Commit and push counter and posted IDs
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/counter.txt data/posted_ids.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update counter and posted IDs - $(date +'%Y-%m-%d %H:%M')"
+        git push
